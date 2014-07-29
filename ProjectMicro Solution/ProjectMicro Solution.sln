@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProjectMicro", "ProjectMicro\ProjectMicro.vcxproj", "{A149256A-909D-4533-9B60-5FAE3CE70DF1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A149256A-909D-4533-9B60-5FAE3CE70DF1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A149256A-909D-4533-9B60-5FAE3CE70DF1}.Debug|Win32.Build.0 = Debug|Win32
+		{A149256A-909D-4533-9B60-5FAE3CE70DF1}.Release|Win32.ActiveCfg = Release|Win32
+		{A149256A-909D-4533-9B60-5FAE3CE70DF1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+EndGlobal
