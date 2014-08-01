@@ -77,8 +77,20 @@ int main(int argc, char *args[])
 			{
 				switch(evt.key.keysym.sym)
 				{
-					case SDLK_ESCAPE:	// ESC key
+					case SDLK_ESCAPE:
 						quit = true;
+						break;
+					case SDLK_UP:
+						keys[UP] = true;
+						break;
+					case SDLK_DOWN:
+						keys[DOWN] = true;
+						break;
+					case SDLK_LEFT:
+						keys[LEFT] = true;
+						break;
+					case SDLK_RIGHT:
+						keys[RIGHT] = true;
 						break;
 				}
 			}
@@ -86,8 +98,20 @@ int main(int argc, char *args[])
 			{
 				switch(evt.key.keysym.sym)
 				{
-					case SDLK_ESCAPE:	//ESC key
+					case SDLK_ESCAPE:
 						quit = true;
+						break;
+					case SDLK_UP:
+						keys[UP] = false;
+						break;
+					case SDLK_DOWN:
+						keys[DOWN] = false;
+						break;
+					case SDLK_LEFT:
+						keys[LEFT] = false;
+						break;
+					case SDLK_RIGHT:
+						keys[RIGHT] = false;
 						break;
 				}
 			}
