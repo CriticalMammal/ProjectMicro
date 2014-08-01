@@ -1,84 +1,92 @@
 //File: game.cpp
 //Prog: Dylan Gallardo
-//Purp: handles all the main logic for the game, such as the event loop.
+//Purp: Handles all the main logic for the game, such as the event loop.
 
 
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <iostream>
+#include <vector>
+#include <string>
 
 #include "definitions.h"
+#include "tile.h"
+#include "tileMap.h"
 
 
 using namespace std;
 
 
 
-//variable definitions
-SDL_Event evt;
-SDL_Window *window = NULL;
-SDL_Renderer *renderer = NULL;
 
-//function definitions 
-bool init();
-void close();
+// Variable Definitions
+SDL_Event evt;					// Event variable
+SDL_Window *window = NULL;		// The game window to render images to
+SDL_Renderer *renderer = NULL;	// Used to render all the game objects
+double zoom = 1;				// Tracks current game magnification
+double xOffset = 0,				// Screen position relative to objects
+	   yOffset = 0;
+int mapWidthInPixels,			// Not useful here, remove this from here and camera.cpp later
+	mapHeightInPixels;
+bool keys[] = {false, false, false, false, false, false}; // Array to track key press booleans
+
+// Function Definitions 
+bool init();			// Initializes SDL parts
+void close();			// Destroys allocated memory and closes the game
 
 
 
-//-------------
-//MAIN FUNCTION
-//-------------
+
 
 int main(int argc, char *args[])
 {
-	//----------
-	//INITIALIZE
-	//----------
 
-	//variables
-	bool quit = false;
+	// Initialize Variables
+	bool quit = false;		// Track when to quit the game
 
-	//initialize SDL
+	// Initialize SDL
 	if (!init())
 	{
 		cout << "SDL failed to initialize" << endl;
 		return -1;
 	}
 
+	// Create a temporary tile map test
+	TileMap theMap;
+	theMap.initialize("no location", 20, 20, 20, 20, *renderer);
+	theMap.setX(0);
+	theMap.setY(0);
+	
 
 
-	//----------
-	//MAIN LOOP
-	//----------
+
+	// ==================================
+	// MAIN LOOP
+	// ==================================
 	while (!quit)
 	{
-		//-------
-		//EVENTS
-		//-------
+
+		// Check for any events
 		while (SDL_PollEvent(&evt) != 0)
 		{
-			if (evt.type == SDL_QUIT)
+			if (evt.type == SDL_QUIT)		    // Quit event
 			{
 				quit = true;
 			}
-
-			//KEYS DOWN
-			else if (evt.type == SDL_KEYDOWN)
+			else if (evt.type == SDL_KEYDOWN)	// Key Down events
 			{
 				switch(evt.key.keysym.sym)
 				{
-					case SDLK_ESCAPE:
+					case SDLK_ESCAPE:	// ESC key
 						quit = true;
 						break;
 				}
 			}
-
-			//KEYS UP
-			else if (evt.type == SDL_KEYUP)
+			else if (evt.type == SDL_KEYUP)		// Key Up events
 			{
 				switch(evt.key.keysym.sym)
 				{
-					case SDLK_ESCAPE:
+					case SDLK_ESCAPE:	//ESC key
 						quit = true;
 						break;
 				}
@@ -88,37 +96,48 @@ int main(int argc, char *args[])
 
 
 
-		//-------
-		//RENDER
-		//-------
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-		SDL_RenderClear(renderer);
-
-		SDL_RenderPresent(renderer);
-	}
+		// ==================================
+		// GAME LOGIC
+		// ==================================
+		SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 
-	//---------
-	//EXIT GAME
-	//---------
-	close();
+
+
+		// ==================================
+		// RENDER
+		// ==================================
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);	// Set render color to black
+		SDL_RenderClear(renderer);						// Clear screen graphics
+
+
+		theMap.drawTileMap(screenRect);	// Draw temporary map
+
+
+		SDL_RenderPresent(renderer);	// Display renderer to the screen
+	} // END while(!quit)
+
+
+
+	close();	//cleans up allocated memory
 	return 0;
+} // END main()
 
-} //END main()
+
 
 
 
 
 bool init()
 {
-	//initialize SDL
+	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		printf("SDL Init failed. SDL_Error: %s\n", SDL_GetError());
 		return false;
 	}
 
-	//create window
+	// Create window
 	window = SDL_CreateWindow("SDL Prototype", 600, 40, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	if (!window)
 	{
@@ -126,7 +145,7 @@ bool init()
 		return false;
 	}
 
-	//create renderer
+	// Create renderer
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!renderer)
 	{
@@ -134,11 +153,11 @@ bool init()
 		return false;
 	}
 	
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);				// Init render draw color to black
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);	// Allow for renderer transparency
 
 
-	//init TTF
+	// Init TTF
 	if (TTF_Init() != 0)
 	{
 		printf("TTF failed to init. SDL_ERROR: %s\n", SDL_GetError());
@@ -152,7 +171,9 @@ bool init()
 	}
 
 	return true;
-} //END init()
+} // END init()
+
+
 
 
 
@@ -166,4 +187,4 @@ void close()
 
 	TTF_Quit();
 	SDL_Quit();
-} //END close()
+} // END close()

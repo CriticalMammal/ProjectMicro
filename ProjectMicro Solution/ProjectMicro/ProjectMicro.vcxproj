@@ -80,10 +80,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="player.cpp" />
+    <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="tile.cpp" />
+    <ClCompile Include="tileMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="definitions.h" />
+    <ClInclude Include="player.h" />
+    <ClInclude Include="sprite.h" />
+    <ClInclude Include="tile.h" />
+    <ClInclude Include="tileMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
