@@ -35,7 +35,7 @@ TileMap::~TileMap()
 
 
 
-void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, int blockHeight, int blockWidth, SDL_Renderer &mainRenderer)
+void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, int blockHeight, int blockWidth, SDL_Renderer *renderer)
 {
 	mapFileName = fileLocation;
 	mapH = mapHeight;
@@ -43,7 +43,7 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 	blockH = blockHeight;
 	blockW = blockWidth;
 	tilePad = 1;
-	renderer = &mainRenderer;
+	//renderer = &mainRenderer;
 
 	//first load the map file into the vector tileMap
 	int mapData;
@@ -105,7 +105,7 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 	//make all recently read tiles into textures and free surfaces
 	for (int i=0; i<blockSurface.size(); i++)
 	{
-		SDL_Texture *tempTexture = loadTexture("emptyString", blockSurface[i]);
+		SDL_Texture *tempTexture = loadTexture("emptyString", blockSurface[i], renderer);
 		blocks.push_back(new Tile);
 		blocks.back()->settileTexture(tempTexture);
 
@@ -139,9 +139,16 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 
 
 
-void TileMap::drawTileMap(SDL_Rect rect1)
+void TileMap::drawTileMap(SDL_Rect rect1, SDL_Renderer *renderer)
 {
 	int tile = 0;
+
+	//doing some quick patching, this draw function is seriously messed up
+	float realX = x;
+	float realY = y;
+	float orgRealX = realX;
+	float orgRealY = realY;
+
 	float tempX = -rect1.x;
 	float tempY = -rect1.y;
 	int orgX = tempX;
@@ -188,39 +195,45 @@ void TileMap::drawTileMap(SDL_Rect rect1)
 
 		for (int w = i; w<rowLength; w++) 
 		{
-			tile = w;
+			if (realX >= tempX && realY >= tempY) //if you are in a drawable boundary (screen rect)
+			{
+				tile = w;
 
-			SDL_Rect blockRect = {tempX, tempY, adjBlockW+tilePad, adjBlockH+tilePad};
+				SDL_Rect blockRect = {realX, realY, adjBlockW+tilePad, adjBlockH+tilePad};
 
-			if (tileMap[tile] == 1)
-			{
-				SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &blockRect);
-			}
-			else if (tileMap[tile] == 2)
-			{
-				SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &blockRect);
-			}
-			else if (tileMap[tile] == 3)
-			{
-				SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &blockRect);
-			}
-			else
-			{
-				SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &blockRect);
+				if (tileMap[tile] == 1)
+				{
+					SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &blockRect);
+				}
+				else if (tileMap[tile] == 2)
+				{
+					SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &blockRect);
+				}
+				else if (tileMap[tile] == 3)
+				{
+					SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &blockRect);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &blockRect);
+				}
 			}
 
-			tempX += adjBlockW;
+			realX += adjBlockW;
 		}
 
-		tempX = orgX;
-		tempY += adjBlockH;
+		realX = orgRealX;
+		realY += adjBlockH;
 		rowLength += mapW;
 
-		if (i>= 300 && rect1.y>=140)
+		if (i >= 300 && rect1.y >= 140)		//wtf is this???
 		{
-			i =i;
+			i = i;
 		}
 	}
+
+	realX = orgRealX;
+	realY = orgRealY;	//reset y value? Prob not neccessary
 
 } //END draw()
 
@@ -665,10 +678,11 @@ vector<pathCoord> TileMap::pathFind(double startX, double startY, double endX, d
 
 
 
-SDL_Texture* TileMap::loadTexture (std::string path, SDL_Surface *currentSurface)
+SDL_Texture* TileMap::loadTexture (std::string path, SDL_Surface *currentSurface, SDL_Renderer *renderer)
 {
+
 	//final image
-	SDL_Texture* newTexture = NULL;
+	SDL_Texture* newTexture = nullptr;
 
 	//Load Image at specified path OR use currentSurface if available
 	SDL_Surface* loadedSurface;
@@ -685,15 +699,14 @@ SDL_Texture* TileMap::loadTexture (std::string path, SDL_Surface *currentSurface
 
 	if (!loadedSurface)
 	{
-		printf("Failed to load image %s. SDL_Error: %s\n", path.c_str(), SDL_GetError());
+		cout << "Failed to load image " << path.c_str() << ". SDL_Error: " << SDL_GetError() << endl;
 	}
 	else
 	{
 		//convert surface to screen format
-		newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-		if (!newTexture)
+		if (!(newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface)))
 		{
-			printf("Failed to create texture %s. SDL_Error: %s\n", path.c_str(), SDL_GetError());
+			cout << "Failed to create texture " << path.c_str() << ". SDL_Error: " << SDL_GetError() << endl;
 		}
 
 		//free old loaded surface

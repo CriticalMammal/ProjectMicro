@@ -16,6 +16,6 @@ Tile::Tile()
 
 Tile::~Tile()
 {
-	//SDL_DestroyTexture(tileTexture);
-	//tileTexture = NULL;
+	SDL_DestroyTexture(tileTexture);
+	tileTexture = NULL;
 }

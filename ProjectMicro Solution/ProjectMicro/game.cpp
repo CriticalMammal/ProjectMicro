@@ -12,6 +12,8 @@
 #include "definitions.h"
 #include "tile.h"
 #include "tileMap.h"
+#include "sprite.h"
+#include "player.h"
 
 
 using namespace std;
@@ -23,12 +25,13 @@ using namespace std;
 SDL_Event evt;					// Event variable
 SDL_Window *window = NULL;		// The game window to render images to
 SDL_Renderer *renderer = NULL;	// Used to render all the game objects
-double zoom = 1;				// Tracks current game magnification
+double zoom = 5;				// Tracks current game magnification
 double xOffset = 0,				// Screen position relative to objects
 	   yOffset = 0;
 int mapWidthInPixels,			// Not useful here, remove this from here and camera.cpp later
 	mapHeightInPixels;
 bool keys[] = {false, false, false, false, false, false}; // Array to track key press booleans
+
 
 // Function Definitions 
 bool init();			// Initializes SDL parts
@@ -41,9 +44,6 @@ void close();			// Destroys allocated memory and closes the game
 int main(int argc, char *args[])
 {
 
-	// Initialize Variables
-	bool quit = false;		// Track when to quit the game
-
 	// Initialize SDL
 	if (!init())
 	{
@@ -51,9 +51,16 @@ int main(int argc, char *args[])
 		return -1;
 	}
 
+	// Initialize Variables
+	bool quit = false;		// Track when to quit the game
+	Player player;
+	player.initializeBoard(*renderer);
+	player.setX(40);
+	player.setY(40);
+
 	// Create a temporary tile map test
 	TileMap theMap;
-	theMap.initialize("no location", 20, 20, 20, 20, *renderer);
+	theMap.initialize("no location", 20, 20, 20, 20, renderer);
 	theMap.setX(0);
 	theMap.setY(0);
 	
@@ -124,8 +131,7 @@ int main(int argc, char *args[])
 		// GAME LOGIC
 		// ==================================
 		SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-
-
+		player.update();
 
 
 		// ==================================
@@ -135,7 +141,8 @@ int main(int argc, char *args[])
 		SDL_RenderClear(renderer);						// Clear screen graphics
 
 
-		theMap.drawTileMap(screenRect);	// Draw temporary map
+		//theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
+		player.draw(renderer);
 
 
 		SDL_RenderPresent(renderer);	// Display renderer to the screen

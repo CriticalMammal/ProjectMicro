@@ -5,19 +5,18 @@
 
 #include "definitions.h"
 #include "sprite.h"
+#include "tile.h"
+#include "tileMap.h"
 #include "player.h"
 
 extern bool keys[];
 extern double xOffset, yOffset, zoom;
-extern SDL_Renderer* renderer;
+//extern SDL_Renderer* renderer;
 
 Player::Player()
 {
 	x = 60*zoom;
 	y = 60*zoom;
-
-	//x = 210;
-	//y = 330;
 
 	width = 10;
 	height = 10;
@@ -53,46 +52,41 @@ Player::Player()
 
 
 
-	//load images
-	SDL_Surface* tempSurf = SDL_LoadBMP("playerCircuit.bmp");
-	tempTexture = loadTexture("playerCircuit.bmp", tempSurf);
-	//tempTexture = SDL_CreateTextureFromSurface(renderer, tempSurf);
+	//create motherboard
+	/*
+	boardWidth = 4;
+	boardHeight = boardWidth;
+	boardCapacity = boardWidth*boardHeight;
+	boardX = x;
+	boardY = y;
 
-	tempSurf = NULL;
-	SDL_FreeSurface(tempSurf);
-
-
-
-
-	//create inventory
-	inventoryOpen = false;
-
-	inventoryWidth = 4;
-	inventoryHeight = inventoryWidth;
-	inventoryCapacity = inventoryWidth*inventoryHeight;
-	inventoryX = x;
-	inventoryY = y;
-
-	double blockWidth = (double)width/(double)inventoryWidth;
-	double blockHeight = (double)height/(double)inventoryHeight;
+	double blockWidth = (double)width/(double)boardWidth;
+	double blockHeight = (double)height/(double)boardHeight;
 
 	std::cout << "blockWidth: " << blockWidth << std::endl;
 
-	double gridX = inventoryX, gridY = inventoryY;
+	double gridX = boardX, gridY = boardY;
 
-	for (int i=0; i<inventoryCapacity; i++)
+	for (int i=0; i<boardCapacity; i++)
 	{
-		for (int w=0; w<inventoryWidth; w++)
+		for (int w=0; w<boardWidth; w++)
 		{
 			SDL_Rect tempRect = {gridX, gridY, blockWidth, blockHeight};
-			inventoryGrid.push_back(tempRect);
+			boardGrid.push_back(tempRect);
 
 			gridX += blockWidth;
 		}
 
 		gridY += blockHeight;
-		gridX = inventoryX;
+		gridX = boardX;
 	}
+	*/
+
+	boardWidth = 10;
+	boardHeight = boardWidth;
+	boardCapacity = boardWidth*boardHeight;
+	boardX = x;
+	boardY = y;
 
 } //END Player()
 
@@ -100,6 +94,18 @@ Player::~Player()
 {
 
 }
+
+
+void Player::initializeBoard(SDL_Renderer &renderer)
+{
+	double blockWidth = (double)width/(double)boardWidth;
+	double blockHeight = (double)height/(double)boardHeight;
+
+	motherBoard.initialize("none", boardHeight, boardWidth, blockHeight, blockWidth, &renderer);
+	motherBoard.setX(x);
+	motherBoard.setY(y);
+}
+
 
 void Player::update()
 {
@@ -182,68 +188,63 @@ void Player::update()
 
 
 
-	//update inventory grid
-	inventoryX = x;
-	inventoryY = y;
+	//update board grid
+	/*
+	boardX = x;
+	boardY = y;
 
-	double blockWidth = (double)width/(double)inventoryWidth;
-	double blockHeight = (double)height/(double)inventoryHeight;
+	double blockWidth = (double)width/(double)boardWidth;
+	double blockHeight = (double)height/(double)boardHeight;
 
-	double gridX = inventoryX, gridY = inventoryY;
+	double gridX = boardX, gridY = boardY;
 
-	for (int i=0; i<inventoryCapacity; i++)
+	for (int i=0; i<boardCapacity; i++)
 	{
-		for (int w=0; w<inventoryWidth; w++)
+		for (int w=0; w<boardWidth; w++)
 		{
-			inventoryGrid[i].x = (gridX*zoom)-xOffset;
-			inventoryGrid[i].y = (gridY*zoom)-yOffset;
-			inventoryGrid[i].w = blockWidth*zoom;
-			inventoryGrid[i].h = blockHeight*zoom;
+			boardGrid[i].x = (gridX*zoom)-xOffset;
+			boardGrid[i].y = (gridY*zoom)-yOffset;
+			boardGrid[i].w = blockWidth*zoom;
+			boardGrid[i].h = blockHeight*zoom;
 
 			gridX += blockWidth;
 			i++;
 		}
 
 		gridY += blockHeight;
-		gridX = inventoryX;
+		gridX = boardX;
 		i--;
 	}
+	*/
+
+	motherBoard.setX(x*zoom-xOffset);
+	motherBoard.setY(y*zoom-yOffset);
 }
 
-void Player::draw()
+void Player::draw(SDL_Renderer *renderer)
 {
-	//SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	//SDL_RenderFillRect(renderer, &playerRect);
-
-	SDL_RenderCopy(renderer, tempTexture, NULL, &playerRect);
-
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderFillRect(renderer, &playerRect);
 
 
 
 	//draw grid
+	/*
 	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 
-	for (int i=0; i<inventoryCapacity; i++)
+	for (int i=0; i<boardCapacity; i++)
 	{
-		SDL_RenderDrawRect(renderer, &inventoryGrid[i]);
+		SDL_RenderDrawRect(renderer, &boardGrid[i]);
 	}
-
-
-
-
-	/*
-	//renders the collision rects
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
-	SDL_RenderDrawRect(renderer, &collisionHorz);
-
-	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
-	SDL_RenderDrawRect(renderer, &collisionVert);
 	*/
+
+	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+	motherBoard.drawTileMap(screenRect, renderer);
 }
 
 
 
-
+/*
 SDL_Texture* Player::loadTexture (std::string path, SDL_Surface *currentSurface)
 {
 	//final image
@@ -281,3 +282,4 @@ SDL_Texture* Player::loadTexture (std::string path, SDL_Surface *currentSurface)
 
 	return newTexture;
 } //END loadSurface()
+*/

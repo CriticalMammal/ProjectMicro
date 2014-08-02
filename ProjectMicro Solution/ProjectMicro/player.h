@@ -4,33 +4,28 @@
 class Player : public Sprite
 {
 	private:
-		bool inventoryOpen;
 		int collisionPad;
 		SDL_Rect playerRect; //used to draw the player square
 		SDL_Texture* tempTexture;
 
-		SDL_Texture* loadTexture (std::string path, SDL_Surface *currentSurface);
+		//motherboard variables (tileMap inside this chip)
+		int boardCapacity;
+		int boardWidth, boardHeight;
+		double boardX, boardY;
 
-
-		//inventory variables
-		int inventoryCapacity;
-		int inventoryWidth, inventoryHeight;
-		double inventoryX, inventoryY;
-
-		std::vector<SDL_Rect> inventoryGrid;
+		std::vector<SDL_Rect> boardGrid;
+		TileMap motherBoard;
 
 	public:
 		Player();
 		~Player();
+		void initializeBoard(SDL_Renderer &renderer);
 		void update();
-		void draw();
+		void draw(SDL_Renderer *renderer);
 		
 		//player rect is the square drawn to represent
 		//the character
 		SDL_Rect getPlayerRect() {return playerRect;}
-		bool getInventoryOpen() {return inventoryOpen;}
-
-		void setInventoryOpen(bool boolIn) {inventoryOpen = boolIn;}
 };
 
 #endif

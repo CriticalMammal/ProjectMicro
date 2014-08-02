@@ -12,9 +12,9 @@ class TileMap
 		std::string mapFileName;
 		int mapH, mapW, blockH, blockW, tilePad;
 		double x, y;
-		SDL_Renderer *renderer;
+		//SDL_Renderer *renderer;
 
-		SDL_Texture* loadTexture(std::string, SDL_Surface*);
+		SDL_Texture* loadTexture(std::string, SDL_Surface*, SDL_Renderer *renderer);
 		float randomNumber(float, float);
 		bool collisionDetect(SDL_Rect, SDL_Rect);
 		int getTileElementAt(int x, int y);
@@ -24,8 +24,8 @@ class TileMap
 		TileMap();
 		~TileMap();
 
-		void initialize(std::string fileLocation, int mapHeight, int mapWidth, int blockHeight, int blockWidth, SDL_Renderer &mainRenderer);
-		void drawTileMap(SDL_Rect);
+		void initialize(std::string fileLocation, int mapHeight, int mapWidth, int blockHeight, int blockWidth, SDL_Renderer *renderer);
+		void drawTileMap(SDL_Rect, SDL_Renderer *renderer);
 
 		//finds tile at x/y coordinates and then returns
 		//the trait value for specified trait
