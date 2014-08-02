@@ -122,6 +122,13 @@ int main(int argc, char *args[])
 						break;
 				}
 			}
+			else if (evt.type == SDL_MOUSEWHEEL)	// MouseWheel event
+			{
+				// Temp Implementation: You should add a function to camera for zooming like this
+				zoom += evt.wheel.y;
+				if (zoom <= 0.5)
+					zoom = 0.5;
+			}
 		}
 
 
@@ -141,7 +148,7 @@ int main(int argc, char *args[])
 		SDL_RenderClear(renderer);						// Clear screen graphics
 
 
-		//theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
+		theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
 		player.draw(renderer);
 
 
