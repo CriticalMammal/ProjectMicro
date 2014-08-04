@@ -99,6 +99,15 @@ int main(int argc, char *args[])
 					case SDLK_RIGHT:
 						keys[RIGHT] = true;
 						break;
+					case SDLK_LEFTBRACKET:
+						zoom += 0.5;	// Temporary zoom implementation
+						break;
+					case SDLK_RIGHTBRACKET:
+						zoom -= 0.5;	// Temporary zoom implementation
+						if (zoom <= 0.1)
+						{
+							zoom = 0.1;
+						}
 				}
 			}
 			else if (evt.type == SDL_KEYUP)		// Key Up events
