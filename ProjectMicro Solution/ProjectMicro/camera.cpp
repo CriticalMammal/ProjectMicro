@@ -15,7 +15,6 @@
 
 extern bool keys[];
 extern double xOffset, yOffset, zoom;
-extern int mapWidthInPixels, mapHeightInPixels;
 
 
 
@@ -40,6 +39,8 @@ Camera::Camera()
 	zoomAccuracy = 0;
 	zoomMaxSpeed = maxSpeed/1000;
 	zoomToPoint = 1;
+
+	framesWaited = 0;
 }
 
 
@@ -101,8 +102,8 @@ void Camera::scrollScreen()
 
 	zoom += zoomVelocity;
 
-	if (zoom <= 0)
-		zoom = 0;
+	if (zoom <= 0.2)
+		zoom = 0.2;
 	else if (zoom >= 50)
 		zoom = 50;
 
@@ -126,6 +127,8 @@ void Camera::scrollScreen()
 	else
 		vy *= friction;
 
+	
+
 	//speed limits
 	if (vx > maxSpeed)
 		vx = maxSpeed;
@@ -143,7 +146,9 @@ void Camera::scrollScreen()
 	xOffset += zoomVelocity*followedObject->getMidX();
 	yOffset += zoomVelocity*followedObject->getMidY();
 
+
 	//don't go past boundaries with camera
+	/*
 	if (xOffset <= 0) 
 		xOffset = 0;
 	else if (xOffset > mapWidthInPixels - SCREEN_WIDTH) 
@@ -153,8 +158,21 @@ void Camera::scrollScreen()
 		yOffset = 0;
 	else if (yOffset > mapHeightInPixels - SCREEN_HEIGHT) 
 		yOffset = mapHeightInPixels - SCREEN_HEIGHT;
+	*/
 }
 
+
+
+void Camera::updateTimer(Sprite *followSprite)
+{
+	framesWaited ++;
+
+	if (framesWaited >= cameraPause)
+	{
+		newMoveToPoint(followSprite, 2, 0);
+		framesWaited = 0;
+	}
+}
 
 
 //this is called every (double cameraPause) seconds

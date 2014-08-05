@@ -139,41 +139,36 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 
 
 
-void TileMap::drawTileMap(SDL_Rect rect1, SDL_Renderer *renderer)
+void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 {
 	int tile = 0;
 
-	//doing some quick patching, this draw function is seriously messed up
+	// Doing some quick patching, this draw function is seriously messed up
 	float realX = x;
 	float realY = y;
 	float orgRealX = realX;
 	float orgRealY = realY;
 
-	float tempX = -rect1.x;
-	float tempY = -rect1.y;
-	int orgX = tempX;
 	float adjBlockW = blockW*zoom;
 	float adjBlockH = blockH*zoom;
-
-	SDL_Rect screenRect = rect1;
-	screenRect.x += 0;
-	screenRect.w -= 0;
-	screenRect.y += 0;
-	screenRect.h -= 0;
 	
-	//figure out the elements you should be drawing
+	// Figure out the elements you should be drawing
 	int tilesWide = screenRect.x/adjBlockW;
 	int tilesHigh = screenRect.y/adjBlockH;
 
-	int elementWidth = (screenRect.x+screenRect.w)/adjBlockW;
-	int elementHeight = (screenRect.y+screenRect.h)/adjBlockH;
-
+	int elementWidth = (screenRect.x + screenRect.w)/adjBlockW;	//-x is xOffset
+	int elementHeight = (screenRect.y + screenRect.h)/adjBlockH;
 
 	int startingElement = tilesHigh*mapW + tilesWide;
-	int rowLength = tilesHigh*mapW + elementWidth+1;
-	int endElement = (elementHeight)*mapW + (elementWidth);
+	int rowLength = elementWidth;
+	int endElement = (elementHeight)*mapW;
 
+	
 	// Checks to ensure that it doesn't attempt to draw more than what exists
+	if (startingElement < 0)
+	{
+		startingElement = 0;
+	}
 	if (endElement >= tileMap.size())
 	{
 		endElement = tileMap.size()-1;
@@ -182,41 +177,40 @@ void TileMap::drawTileMap(SDL_Rect rect1, SDL_Renderer *renderer)
 	{
 		rowLength = mapW;
 	}
-	
-	tempX += tilesWide * adjBlockW;
-	orgX = tempX;
 
-	tempY += tilesHigh * adjBlockH;
 
-	
-	//draw elements
+	// This ultimately hinders performance with a very large map. If you want to fix this
+	// you'll need to re-write how you draw everything. The x and y values are set up to draw
+	// the map from where it starts... not where whatever starting element may be starts.
+	// to temporarily fix this I've set it to always start looping from the beginning of the map.
+	startingElement = 0;
+
+
+	// Draw elements
 	for (int i=startingElement; i<endElement; i+=mapW)
 	{
 
 		for (int w = i; w<rowLength; w++) 
 		{
-			if (realX >= tempX && realY >= tempY) //if you are in a drawable boundary (screen rect)
+			tile = w;
+
+			SDL_Rect blockRect = {realX, realY, adjBlockW+tilePad, adjBlockH+tilePad};
+
+			if (tileMap[tile] == 1)
 			{
-				tile = w;
-
-				SDL_Rect blockRect = {realX, realY, adjBlockW+tilePad, adjBlockH+tilePad};
-
-				if (tileMap[tile] == 1)
-				{
-					SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &blockRect);
-				}
-				else if (tileMap[tile] == 2)
-				{
-					SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &blockRect);
-				}
-				else if (tileMap[tile] == 3)
-				{
-					SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &blockRect);
-				}
-				else
-				{
-					SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &blockRect);
-				}
+				SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &blockRect);
+			}
+			else if (tileMap[tile] == 2)
+			{
+				SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &blockRect);
+			}
+			else if (tileMap[tile] == 3)
+			{
+				SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &blockRect);
+			}
+			else
+			{
+				SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &blockRect);
 			}
 
 			realX += adjBlockW;
@@ -225,17 +219,9 @@ void TileMap::drawTileMap(SDL_Rect rect1, SDL_Renderer *renderer)
 		realX = orgRealX;
 		realY += adjBlockH;
 		rowLength += mapW;
-
-		if (i >= 300 && rect1.y >= 140)		//wtf is this???
-		{
-			i = i;
-		}
 	}
 
-	realX = orgRealX;
-	realY = orgRealY;	//reset y value? Prob not neccessary
-
-} //END draw()
+} // END draw()
 
 
 

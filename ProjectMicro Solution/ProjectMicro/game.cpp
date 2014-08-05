@@ -8,11 +8,13 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <time.h>
 
 #include "definitions.h"
 #include "tile.h"
 #include "tileMap.h"
 #include "sprite.h"
+#include "camera.h"
 #include "player.h"
 
 
@@ -43,6 +45,7 @@ void close();			// Destroys allocated memory and closes the game
 
 int main(int argc, char *args[])
 {
+	srand((unsigned)time(NULL)); //seed random numbers
 
 	// Initialize SDL
 	if (!init())
@@ -53,16 +56,20 @@ int main(int argc, char *args[])
 
 	// Initialize Variables
 	bool quit = false;		// Track when to quit the game
-	Player player;
-	player.initializeBoard(*renderer);
-	player.setX(40);
-	player.setY(40);
+	Player *player = new Player;
+	player->initializeBoard(*renderer);
+	player->setX(0);
+	player->setY(0);
+
+	Camera camera;
+	camera.setfollowedObject(player);
+	camera.newZoom(5, 0.01, 0.5, 0.1);
 
 	// Create a temporary tile map test
 	TileMap theMap;
 	theMap.initialize("no location", 20, 20, 20, 20, renderer);
-	theMap.setX(0);
-	theMap.setY(0);
+	theMap.setX(xOffset);
+	theMap.setY(yOffset);
 	
 
 
@@ -134,9 +141,7 @@ int main(int argc, char *args[])
 			else if (evt.type == SDL_MOUSEWHEEL)	// MouseWheel event
 			{
 				// Temp Implementation: You should add a function to camera for zooming like this
-				zoom += evt.wheel.y;
-				if (zoom <= 0.5)
-					zoom = 0.5;
+				camera.newZoom(zoom+(evt.wheel.y*(zoom/2)), 0.01, 0.5, 0.1);
 			}
 		}
 
@@ -146,8 +151,17 @@ int main(int argc, char *args[])
 		// ==================================
 		// GAME LOGIC
 		// ==================================
-		SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-		player.update();
+		camera.updateTimer(player);
+
+		player->update();
+		theMap.setX(-xOffset);
+		theMap.setY(-yOffset);
+
+		camera.handleKeys(player->getSpeed());
+		camera.scrollScreen();
+
+		SDL_Rect screenRect = {xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT};
+
 
 
 		// ==================================
@@ -158,7 +172,7 @@ int main(int argc, char *args[])
 
 
 		theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
-		player.draw(renderer);
+		player->draw(renderer);
 
 
 		SDL_RenderPresent(renderer);	// Display renderer to the screen

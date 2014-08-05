@@ -13,6 +13,7 @@ class Camera
 			zoomVelocity, zoomSpeed, zoomMaxSpeed, zoomAccuracy, zoomToPoint;
 		int width, height, moveToPointX, moveToPointY,
 			accuracy, motion;
+		int framesWaited;
 		Sprite *followedObject;
 
 	public:
@@ -20,6 +21,7 @@ class Camera
 		~Camera();
 		void handleKeys(double playerSpeed);
 		void scrollScreen();
+		void updateTimer(Sprite *sprite);
 		void newMoveToPoint(Sprite *sprite, double xAdj, double yAdj);
 		void newZoom(double newZoom, double speed, double maxSpeed, double accuracy);
 		double randomNumber(double Min, double Max);
