@@ -16,17 +16,18 @@ class Camera
 		int framesWaited;
 		Sprite *followedObject;
 
+		void updateZoom();
+		void scrollScreen();
+		void updateTimer();
+		void newMoveToPoint(Sprite *sprite);
+		double randomNumber(double Min, double Max);
+
 	public:
 		Camera();
 		~Camera();
-		void handleKeys(double playerSpeed);
-		void scrollScreen();
-		void updateTimer(Sprite *sprite);
-		void newMoveToPoint(Sprite *sprite, double xAdj, double yAdj);
+		void updateCamera();
 		void newZoom(double newZoom, double speed, double maxSpeed, double accuracy);
-		double randomNumber(double Min, double Max);
 
-		//quick inline functions
 		double getSpeed() {return speed;}
 		double getCameraPause() {return cameraPause;}
 		int   getAccuracy() {return accuracy;}

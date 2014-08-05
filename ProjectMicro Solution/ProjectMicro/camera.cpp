@@ -31,8 +31,8 @@ Camera::Camera()
 	friction = 0.1;
 	vx = 0;
 	vy = 0;
-	accuracy = 5;    //how close the camera moves to the points
-	motion = 0;	 //amount of camera motion/drift
+	accuracy = 5;			//how close the camera moves to the points
+	motion = 0;				//amount of camera motion/drift
 	cameraPause = 0.05*FPS; //frames to wait to renew moveTo points
 
 	zoomSpeed = 0.00001;
@@ -52,41 +52,22 @@ Camera::~Camera()
 
 
 
-void Camera::handleKeys(double objectSpeed)
+void Camera::updateCamera()
 {
-	if (keys[LEFT])
-	{
-		xOffset += -objectSpeed;
-	}
-	else if (keys[RIGHT])
-	{
-		xOffset += objectSpeed;
-	}
-	
-
-	if (keys[UP])
-	{
-		yOffset += -objectSpeed;
-	}
-	else if (keys[DOWN])
-	{
-		yOffset += objectSpeed;
-	}
+	updateZoom();
+	scrollScreen();
+	updateTimer();
 }
 
 
-
-//scroll camera/screen towards the defined moveTo coordinates
-void Camera::scrollScreen()
+void Camera::updateZoom()
 {
-	//could substitute this with Manhattan dist if performance problems arise
-	double distance = sqrt(pow(double(moveToPointX-xOffset), 2) + pow(double(moveToPointY-yOffset), 2));
 	double zoomDist = abs(zoom-zoomToPoint);
 
 	zoomSpeed = zoomDist / 200;
 	zoomMaxSpeed = zoomDist / 5;
 
-	//handle zooming
+	// Handle zooming
 	if (zoom < zoomToPoint - zoomAccuracy)
 		zoomVelocity += zoomSpeed;
 	else if (zoom > zoomToPoint + zoomAccuracy)
@@ -106,30 +87,35 @@ void Camera::scrollScreen()
 		zoom = 0.2;
 	else if (zoom >= 50)
 		zoom = 50;
+}
 
 
-	//std::cout << distance << std::endl;
+//scroll camera/screen towards the defined moveTo coordinates
+void Camera::scrollScreen()
+{
+	// Sqrt could be substituted with Manhattan Dist
+	double distance = sqrt(pow(double(moveToPointX-xOffset), 2) + pow(double(moveToPointY-yOffset), 2));
+
 	speed = distance / 60;
 	maxSpeed = distance / 5;
 
-	//test what directions to scroll screen
-	if (xOffset < moveToPointX - accuracy)		//too far left
+	// Test what directions to scroll screen
+	if (xOffset < moveToPointX - accuracy)		// Too far left
 		vx += speed;
-	else if (xOffset > moveToPointX + accuracy)	//too far right
+	else if (xOffset > moveToPointX + accuracy)	// Too far right
 		vx -= speed;
 	else
 		vx *= friction;
 
-	if (yOffset < moveToPointY - accuracy)		//too far left
+	if (yOffset < moveToPointY - accuracy)		// Too far left
 		vy += speed;
-	else if (yOffset > moveToPointY + accuracy) //too far right
+	else if (yOffset > moveToPointY + accuracy) // Too far right
 		vy -= speed;
 	else
 		vy *= friction;
 
-	
 
-	//speed limits
+	// Speed limits
 	if (vx > maxSpeed)
 		vx = maxSpeed;
 	else if (vx < -maxSpeed)
@@ -145,44 +131,30 @@ void Camera::scrollScreen()
 
 	xOffset += zoomVelocity*followedObject->getMidX();
 	yOffset += zoomVelocity*followedObject->getMidY();
-
-
-	//don't go past boundaries with camera
-	/*
-	if (xOffset <= 0) 
-		xOffset = 0;
-	else if (xOffset > mapWidthInPixels - SCREEN_WIDTH) 
-		xOffset = mapWidthInPixels - SCREEN_WIDTH;
-
-	if (yOffset <= 0) 
-		yOffset = 0;
-	else if (yOffset > mapHeightInPixels - SCREEN_HEIGHT) 
-		yOffset = mapHeightInPixels - SCREEN_HEIGHT;
-	*/
 }
 
 
 
-void Camera::updateTimer(Sprite *followSprite)
+void Camera::updateTimer()
 {
 	framesWaited ++;
 
 	if (framesWaited >= cameraPause)
 	{
-		newMoveToPoint(followSprite, 2, 0);
+		newMoveToPoint(followedObject);
 		framesWaited = 0;
 	}
 }
 
 
-//this is called every (double cameraPause) seconds
-void Camera::newMoveToPoint(Sprite *sprite, double xAdj, double yAdj)
+// Called every (cameraPause) seconds
+void Camera::newMoveToPoint(Sprite *sprite)
 {
 	double zoomDiff = zoomToPoint + ((zoom-zoomToPoint)/2);
 	followedObject = sprite;
 
-	moveToPointX = (((sprite->getMidX()+xAdj)*zoom)-0.5*SCREEN_WIDTH) + randomNumber(-motion, motion);
-	moveToPointY = (((sprite->getMidY()+yAdj)*zoom)-0.5*SCREEN_HEIGHT) + randomNumber(-motion, motion);
+	moveToPointX = ((sprite->getMidX()*zoom)-0.5*SCREEN_WIDTH) + randomNumber(-motion, motion);
+	moveToPointY = ((sprite->getMidY()*zoom)-0.5*SCREEN_HEIGHT) + randomNumber(-motion, motion);
 }
 
 

@@ -107,14 +107,10 @@ int main(int argc, char *args[])
 						keys[RIGHT] = true;
 						break;
 					case SDLK_LEFTBRACKET:
-						zoom += 0.5;	// Temporary zoom implementation
+						camera.newZoom(zoom+(zoom/2), 0.01, 0.5, 0.1);
 						break;
 					case SDLK_RIGHTBRACKET:
-						zoom -= 0.5;	// Temporary zoom implementation
-						if (zoom <= 0.1)
-						{
-							zoom = 0.1;
-						}
+						camera.newZoom(zoom+(zoom/2), 0.01, 0.5, 0.1);
 				}
 			}
 			else if (evt.type == SDL_KEYUP)		// Key Up events
@@ -140,7 +136,6 @@ int main(int argc, char *args[])
 			}
 			else if (evt.type == SDL_MOUSEWHEEL)	// MouseWheel event
 			{
-				// Temp Implementation: You should add a function to camera for zooming like this
 				camera.newZoom(zoom+(evt.wheel.y*(zoom/2)), 0.01, 0.5, 0.1);
 			}
 		}
@@ -151,14 +146,11 @@ int main(int argc, char *args[])
 		// ==================================
 		// GAME LOGIC
 		// ==================================
-		camera.updateTimer(player);
+		camera.updateCamera();
 
 		player->update();
 		theMap.setX(-xOffset);
 		theMap.setY(-yOffset);
-
-		camera.handleKeys(player->getSpeed());
-		camera.scrollScreen();
 
 		SDL_Rect screenRect = {xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT};
 
@@ -183,7 +175,6 @@ int main(int argc, char *args[])
 	close();	//cleans up allocated memory
 	return 0;
 } // END main()
-
 
 
 
@@ -233,7 +224,6 @@ bool init()
 
 	return true;
 } // END init()
-
 
 
 
