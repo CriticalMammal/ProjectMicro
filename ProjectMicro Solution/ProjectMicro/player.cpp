@@ -109,6 +109,13 @@ void Player::initializeBoard(SDL_Renderer &renderer)
 
 void Player::update()
 {
+	updateCollisionRects();
+	updateMotherboard();
+}
+
+
+void Player::handleKeys()
+{
 	//check left/right key presses
 	if (keys[LEFT])
 	{
@@ -164,8 +171,11 @@ void Player::update()
 	oldY = y;
 	x += vx;
 	y += vy;
+} //END handleKeys()
 
-	//update collision rects etc
+
+void Player::updateCollisionRects()
+{
 	playerRect.x = (x*zoom-xOffset);
 	playerRect.y = (y*zoom-yOffset);
 	playerRect.w = width*zoom;
@@ -185,10 +195,12 @@ void Player::update()
 	collisionVert.y = y;
 	collisionVert.w = width-collisionPad*2;
 	collisionVert.h = height;
+} // END updateCollisionRects()
 
 
-
-	//update board grid
+void Player::updateMotherboard()
+{
+	// Old board grid implementation
 	/*
 	boardX = x;
 	boardY = y;
@@ -219,7 +231,8 @@ void Player::update()
 
 	motherBoard.setX(x*zoom-xOffset);
 	motherBoard.setY(y*zoom-yOffset);
-}
+} // END updateMotherboard()
+
 
 void Player::draw(SDL_Renderer *renderer)
 {
@@ -238,48 +251,6 @@ void Player::draw(SDL_Renderer *renderer)
 	}
 	*/
 
-	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+	SDL_Rect screenRect = {xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT};
 	motherBoard.drawTileMap(screenRect, renderer);
-}
-
-
-
-/*
-SDL_Texture* Player::loadTexture (std::string path, SDL_Surface *currentSurface)
-{
-	//final image
-	SDL_Texture* newTexture = NULL;
-
-	//Load Image at specified path OR use currentSurface if available
-	SDL_Surface* loadedSurface;
-
-	if (!currentSurface)
-	{
-		loadedSurface = SDL_LoadBMP(path.c_str());
-	}
-	else
-	{
-		loadedSurface = currentSurface;
-	}
-	
-
-	if (!loadedSurface)
-	{
-		printf("Failed to load image %s. SDL_Error: %s\n", path.c_str(), SDL_GetError());
-	}
-	else
-	{
-		//convert surface to screen format
-		newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-		if (!newTexture)
-		{
-			printf("Failed to create texture %s. SDL_Error: %s\n", path.c_str(), SDL_GetError());
-		}
-
-		//free old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-
-	return newTexture;
-} //END loadSurface()
-*/
+} // END draw()

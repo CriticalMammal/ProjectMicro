@@ -56,13 +56,41 @@ int main(int argc, char *args[])
 
 	// Initialize Variables
 	bool quit = false;		// Track when to quit the game
-	Player *player = new Player;
-	player->initializeBoard(*renderer);
-	player->setX(0);
-	player->setY(0);
+	int chipLayers = 2;		// How many chips there will be
+	vector<Player*> chips;	// Vector to contain player chips
+
+	// Temp player chip implementation
+	int controlledChip = 0;
+	double chipStartX = 60*zoom, chipStartY = 60*zoom, 
+		chipStartW = 600, chipStartH = 600;
+	double oldX, oldY, oldW, oldH;
+	oldX = chipStartX;
+	oldY = chipStartY;
+	oldW = chipStartW;
+	oldH = chipStartH;
+
+	for (int i=0; i<chipLayers; i++)
+	{
+		chips.push_back(new Player);
+		chips.back()->setX(oldX+(oldW/15));
+		chips.back()->setY(oldY+(oldH/15));
+		chips.back()->setWidth(oldW/15);
+		chips.back()->setHeight(oldH/15);
+		chips.back()->initializeBoard(*renderer);
+
+		oldX = oldX+(oldW/15);
+		oldY = oldY+(oldH/15);
+		oldW = oldW/15;
+		oldH = oldH/15;
+	}
+
+	if (zoom <= 1)
+		controlledChip = 0;
+	else if (zoom > 1 && zoom < 10)
+		controlledChip = 1;
 
 	Camera camera;
-	camera.setfollowedObject(player);
+	camera.setfollowedObject(chips[controlledChip]);
 	camera.newZoom(5, 0.01, 0.5, 0.1);
 
 	// Create a temporary tile map test
@@ -146,9 +174,25 @@ int main(int argc, char *args[])
 		// ==================================
 		// GAME LOGIC
 		// ==================================
+		if (zoom <= 1)
+			controlledChip = 0;
+		else if (zoom > 1 && zoom < 10)
+			controlledChip = 1;
+
+		camera.setfollowedObject(chips[controlledChip]);
 		camera.updateCamera();
 
-		player->update();
+
+		for (int i=0; i<chipLayers; i++)
+		{
+			if (i >= controlledChip)
+			{
+				chips[i]->handleKeys();
+			}
+
+			chips[i]->update();
+		}
+
 		theMap.setX(-xOffset);
 		theMap.setY(-yOffset);
 
@@ -164,7 +208,11 @@ int main(int argc, char *args[])
 
 
 		theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
-		player->draw(renderer);
+
+		for (int i=0; i<chipLayers; i++)	// Draw chips
+		{
+			chips[i]->draw(renderer);
+		}
 
 
 		SDL_RenderPresent(renderer);	// Display renderer to the screen
