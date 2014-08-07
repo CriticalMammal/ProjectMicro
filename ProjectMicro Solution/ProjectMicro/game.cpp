@@ -174,13 +174,15 @@ int main(int argc, char *args[])
 		// ==================================
 		// GAME LOGIC
 		// ==================================
+
+		camera.setfollowedObject(chips[controlledChip]);
+		camera.updateCamera();
+
+
 		if (zoom <= 1)
 			controlledChip = 0;
 		else if (zoom > 1 && zoom < 10)
 			controlledChip = 1;
-
-		camera.setfollowedObject(chips[controlledChip]);
-		camera.updateCamera();
 
 
 		for (int i=0; i<chipLayers; i++)
@@ -207,7 +209,7 @@ int main(int argc, char *args[])
 		SDL_RenderClear(renderer);						// Clear screen graphics
 
 
-		theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
+		//theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
 
 		for (int i=0; i<chipLayers; i++)	// Draw chips
 		{

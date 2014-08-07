@@ -9,6 +9,7 @@ class TileMap
 		std::vector<Tile*> blocks;
 
 		std::vector<int> tileMap;
+		std::vector<SDL_Rect> tileRects;
 		std::string mapFileName;
 		int mapH, mapW, blockH, blockW, tilePad;
 		double x, y;
@@ -18,6 +19,8 @@ class TileMap
 		float randomNumber(float, float);
 		bool collisionDetect(SDL_Rect, SDL_Rect);
 		int getTileElementAt(int x, int y);
+		std::vector<int> getTilesInRect(SDL_Rect rect1);
+		void updateTileRects();
 		
 
 	public:

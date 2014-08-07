@@ -67,6 +67,27 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 	}
 
 
+	// Populate tileRect vector
+	float realX = x;
+	float realY = y;
+	float orgRealX = realX;
+
+	for (int i=0; i<tileMap.size(); i++)
+	{
+		for (int w=0; w<mapWidth; w++)
+		{
+			SDL_Rect tempRect = {realX, realY, blockW, blockH};
+			tileRects.push_back(tempRect);
+
+			realX += blockWidth;
+			i++;
+		}
+
+		realX = orgRealX;
+		realY += blockHeight;
+	}
+
+
 	//"tileSheet.bmp" should be a parameter in the init function
 	//to make this class more versatile
 	tileSheet = SDL_LoadBMP("tileSheet.bmp");
@@ -139,79 +160,28 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 
 
 
-void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
+void TileMap::updateTileRects()
 {
-	int tile = 0;
-
-	// Doing some quick patching, this draw function is seriously messed up
 	float realX = x;
 	float realY = y;
 	float orgRealX = realX;
-	float orgRealY = realY;
 
 	float adjBlockW = blockW*zoom;
 	float adjBlockH = blockH*zoom;
-	
-	// Figure out the elements you should be drawing
-	int tilesWide = screenRect.x/adjBlockW;
-	int tilesHigh = screenRect.y/adjBlockH;
 
-	int elementWidth = (screenRect.x + screenRect.w)/adjBlockW;	//-x is xOffset
-	int elementHeight = (screenRect.y + screenRect.h)/adjBlockH;
-
-	int startingElement = tilesHigh*mapW + tilesWide;
-	int rowLength = elementWidth;
-	int endElement = (elementHeight)*mapW;
-
-	
-	// Checks to ensure that it doesn't attempt to draw more than what exists
-	if (startingElement < 0)
-	{
-		startingElement = 0;
-	}
-	if (endElement >= tileMap.size())
-	{
-		endElement = tileMap.size()-1;
-	}
-	if (rowLength >= mapW)
-	{
-		rowLength = mapW;
-	}
+	int rowLength = mapW;
 
 
-	// This ultimately hinders performance with a very large map. If you want to fix this
-	// you'll need to re-write how you draw everything. The x and y values are set up to draw
-	// the map from where it starts... not where whatever starting element may be starts.
-	// to temporarily fix this I've set it to always start looping from the beginning of the map.
-	startingElement = 0;
-
-
-	// Draw elements
-	for (int i=startingElement; i<endElement; i+=mapW)
+	// Update Tile rect positions
+	for (int i=0; i<tileMap.size()-1; i+=mapW) // Had to do size()-1 for some reason? shouldn't this be even?
 	{
 
 		for (int w = i; w<rowLength; w++) 
 		{
-			tile = w;
-
-			SDL_Rect blockRect = {realX, realY, adjBlockW+tilePad, adjBlockH+tilePad};
-
-			if (tileMap[tile] == 1)
-			{
-				SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &blockRect);
-			}
-			else if (tileMap[tile] == 2)
-			{
-				SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &blockRect);
-			}
-			else if (tileMap[tile] == 3)
-			{
-				SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &blockRect);
-			}
-			else
-			{
-				SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &blockRect);
-			}
+			tileRects[w].x = realX;
+			tileRects[w].y = realY;
+			tileRects[w].w = adjBlockW+tilePad;
+			tileRects[w].h = adjBlockH+tilePad;
 
 			realX += adjBlockW;
 		}
@@ -219,6 +189,41 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 		realX = orgRealX;
 		realY += adjBlockH;
 		rowLength += mapW;
+	}
+}
+
+
+
+void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
+{
+	updateTileRects(); // Temporary, shouldn't call this from draw()
+
+	vector<int> tilesToDraw = getTilesInRect(screenRect);
+
+	if (tilesToDraw.size() <= 0)
+	{
+		return;
+	}
+
+	// Draw elements
+	for (int i=tilesToDraw.front(); i<tilesToDraw.size(); i++)
+	{
+			if (tileMap[i] == 1)
+			{
+				SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &tileRects[i]);
+			}
+			else if (tileMap[i] == 2)
+			{
+				SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &tileRects[i]);
+			}
+			else if (tileMap[i] == 3)
+			{
+				SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &tileRects[i]);
+			}
+			else
+			{
+				SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &tileRects[i]);
+			}
 	}
 
 } // END draw()
@@ -292,54 +297,41 @@ int TileMap::getTileTraitAt(int x, int y, int trait)
 
 
 
-//pretty much useless with the new collisions implemented. Tile instances could store rects so that
-//you can easily obtain x,y,w,h info
-SDL_Rect TileMap::getTileRectAt(int x, int y)
+// This doesn't seem to return the tiles you expect it to
+// Expects rect1 to have proper perspective (zoom) applied
+vector<int> TileMap::getTilesInRect(SDL_Rect rect1)
 {
-	//If you divide the coordinates by the width/height of each tile...
-	//you should be able to find out the element it would be in the vector
-	int tilesWide = x/blockW;
-	int tilesHigh = y/blockH;
+	float adjBlockW = blockW*zoom;
+	float adjBlockH = blockH*zoom;
 
-	int tileX = blockW*tilesWide;
-	int tileY = blockH*tilesHigh;
+	int tilesWide = rect1.x/adjBlockW;
+	int tilesHigh = rect1.y/adjBlockH;
 
-	//each tilesHigh will be an entire row of tiles, aka the mapW
-	int tileElement = tilesHigh*mapW + tilesWide;
-
-	if (tileElement > 0 && tileElement < tileMap.size())
-	{
-		//return rect
-		SDL_Rect tileRect = {tileX, tileY, tileX+blockW, tileY+blockH};
-		return tileRect;
-	}
-	else
-	{
-		SDL_Rect nullRect = {NULL, NULL, NULL, NULL};
-		return nullRect;
-	}
-}
-
-
-
-bool TileMap::checkCollision(SDL_Rect rect1)
-{
-	//some of these probably need renaming to be clear such as
-	//elementWidth... since it's not clear what that is exactly
-	int tilesWide = rect1.x/blockW;
-	int tilesHigh = rect1.y/blockH;
-
-	int elementWidth = (rect1.x+rect1.w)/blockW;
-	int elementHeight = (rect1.y+rect1.h)/blockH;
+	int elementWidth = (rect1.x+rect1.w)/adjBlockW;
+	int elementHeight = (rect1.y+rect1.h)/adjBlockH;
 
 	int startingElement = tilesHigh*mapW + tilesWide;
-	int rowLength = tilesHigh*mapW + elementWidth+1;
-	int endElement = (elementHeight)*mapW + (elementWidth);
+	int rowLength = elementWidth-1;
+	int endElement = (elementHeight)*mapW + (elementWidth-1);
+
+
+	if (startingElement < 0)
+	{
+		startingElement = 0;
+	}
+	if (endElement >= tileMap.size())
+	{
+		endElement = tileMap.size()-1;
+	}
+	if (rowLength >= mapW)
+	{
+		rowLength = mapW;
+	}
 
 
 	vector<int> collidingElements;
 
-	for (int i=startingElement; i<=endElement; i+=mapW)
+	for (int i=startingElement; i<endElement; i+=mapW)
 	{
 		for (int w = i; w<rowLength; w++) 
 		{
@@ -349,12 +341,21 @@ bool TileMap::checkCollision(SDL_Rect rect1)
 		rowLength += mapW;
 	}
 
+	return collidingElements;
+}
+
+
+
+bool TileMap::checkCollision(SDL_Rect rect1)
+{
+	vector<int> possibleCollidingTiles = getTilesInRect(rect1);
+
 	//weird approach, you needed to find the x,y of an element in the tile array to
 	//get the collision rect. But it should be easier than this. The x/y etc. should
 	//probably be stored in each tile instance for convenience sake.
-	for (int c=0; c<collidingElements.size(); c++)
+	for (int c=0; c<possibleCollidingTiles.size(); c++)
 	{
-		int tileElement = collidingElements[c];
+		int tileElement = possibleCollidingTiles[c];
 		int tileX = (tileElement%mapW) * blockW;
 		int tileY = tileElement/mapW * blockH;
 		int tileW = tileX + blockW;
@@ -363,6 +364,16 @@ bool TileMap::checkCollision(SDL_Rect rect1)
 
 		if (getTileTraitAt(tileX, tileY, 0) == 1 &&
 			collisionDetect(rect1, tileRect))
+		{
+			return true;
+		}
+	}
+
+	// Replacement for above code using the new vector tileRects[]
+	for (int i=0; i<possibleCollidingTiles.size(); i++)
+	{
+		if (getTileTraitAt(tileRects[i].x, tileRects[i].y, 0) == 1 &&
+			collisionDetect(rect1, tileRects[i]))
 		{
 			return true;
 		}
