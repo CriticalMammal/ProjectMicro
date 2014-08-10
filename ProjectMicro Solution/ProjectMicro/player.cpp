@@ -176,8 +176,8 @@ void Player::handleKeys()
 
 void Player::updateCollisionRects()
 {
-	playerRect.x = (x*zoom-xOffset);
-	playerRect.y = (y*zoom-yOffset);
+	playerRect.x = x*zoom-xOffset;
+	playerRect.y = y*zoom-yOffset;
 	playerRect.w = width*zoom;
 	playerRect.h = height*zoom;
 
@@ -251,6 +251,6 @@ void Player::draw(SDL_Renderer *renderer)
 	}
 	*/
 
-	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+	SDL_Rect screenRect = {xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT};
 	motherBoard.drawTileMap(screenRect, renderer);
 } // END draw()

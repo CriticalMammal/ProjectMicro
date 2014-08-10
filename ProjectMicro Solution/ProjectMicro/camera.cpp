@@ -6,7 +6,7 @@
 
 #include <SDL.h>
 #include <stdlib.h>
-#include<iostream>
+#include <iostream>
 #include <math.h>
 
 #include "definitions.h"
@@ -21,26 +21,32 @@ extern double xOffset, yOffset, zoom;
 Camera::Camera()
 {
 	followedObject = NULL;
-
+	
 	moveToPointX = 0;
 	moveToPointY = 0;
 	xOffset = moveToPointX;
 	yOffset = moveToPointY;
-	speed = 0.01;
-	maxSpeed = .2;
-	friction = 0.1;
-	vx = 0;
-	vy = 0;
-	accuracy = 5;			//how close the camera moves to the points
-	motion = 0;				//amount of camera motion/drift
 	cameraPause = 0.05*FPS; //frames to wait to renew moveTo points
 
-	zoomSpeed = 0.00001;
-	zoomAccuracy = 0;
-	zoomMaxSpeed = maxSpeed/1000;
+	motion = 2;				//amount of camera motion/drift
+	additionalMotionX = 0;
+	additionalMotionY = 0;
+	shakeDelayRange = 2;
+	shakeDelay = randomNumber(0, shakeDelayRange)*FPS;
+
 	zoomToPoint = 1;
 
 	framesWaited = 0;
+	movementTimer = 0;
+	shakeTimer = 0;
+
+	lerpAmt = 0.0;
+	zoomLerp = 0.0;
+
+	xScroll = xOffset;
+	yScroll = yOffset;
+
+	zoomScroll = zoom;
 }
 
 
@@ -62,88 +68,74 @@ void Camera::updateCamera()
 
 void Camera::updateZoom()
 {
-	double zoomDist = abs(zoom-zoomToPoint);
+	if (zoom != zoomToPoint)
+	{
+		zoomLerp = 0.0;
+	}
 
-	zoomSpeed = zoomDist / 200;
-	zoomMaxSpeed = zoomDist / 5;
+	if (zoomLerp < 1.0)
+	{
+		zoomLerp += 0.05;
+	}
 
-	// Handle zooming
-	if (zoom < zoomToPoint - zoomAccuracy)
-		zoomVelocity += zoomSpeed;
-	else if (zoom > zoomToPoint + zoomAccuracy)
-		zoomVelocity -= zoomSpeed;
-	else
-		zoomVelocity *= friction;
+	zoomScroll = lerp(zoom, zoomLerp, zoomToPoint);
 
-	
-	if (zoomVelocity > zoomMaxSpeed)
-		zoomVelocity = zoomMaxSpeed;
-	else if (zoomVelocity < -zoomMaxSpeed)
-		zoomVelocity = -zoomMaxSpeed;
-
-	zoom += zoomVelocity;
-
-	if (zoom <= 0.2)
-		zoom = 0.2;
-	else if (zoom >= 50)
-		zoom = 50;
+	zoom = zoomScroll;
 }
 
 
 //scroll camera/screen towards the defined moveTo coordinates
 void Camera::scrollScreen()
 {
-	// Sqrt could be substituted with Manhattan Dist
-	double distance = sqrt(pow(double(moveToPointX-xOffset), 2) + pow(double(moveToPointY-yOffset), 2));
+	//xOffset += zoomVelocity*followedObject->getMidX();
+	//yOffset += zoomVelocity*followedObject->getMidY();
 
-	speed = distance / 60;
-	maxSpeed = distance / 5;
+	if (xOffset != moveToPointX && yOffset != moveToPointY)
+	{
+		lerpAmt = 0;
+	}
 
-	// Test what directions to scroll screen
-	if (xOffset < moveToPointX - accuracy)		// Too far left
-		vx += speed;
-	else if (xOffset > moveToPointX + accuracy)	// Too far right
-		vx -= speed;
-	else
-		vx *= friction;
+	if (lerpAmt < 1.0)
+	{
+		lerpAmt += 0.1;
+	}
 
-	if (yOffset < moveToPointY - accuracy)		// Too far left
-		vy += speed;
-	else if (yOffset > moveToPointY + accuracy) // Too far right
-		vy -= speed;
-	else
-		vy *= friction;
+	// Linear Interpolation between points
+	xScroll = lerp(xOffset, lerpAmt, moveToPointX);
+	yScroll = lerp(yOffset, lerpAmt, moveToPointY);
 
-
-	// Speed limits
-	if (vx > maxSpeed)
-		vx = maxSpeed;
-	else if (vx < -maxSpeed)
-		vx = -maxSpeed;
-	if (vy > maxSpeed)
-		vy = maxSpeed;
-	else if (vy < -maxSpeed)
-		vy = -maxSpeed;
-	
-
-	xOffset += vx;
-	yOffset += vy;
-
-	xOffset += zoomVelocity*followedObject->getMidX();
-	yOffset += zoomVelocity*followedObject->getMidY();
+	// Move screen
+	xOffset = xScroll;
+	yOffset = yScroll;
 }
 
 
 
 void Camera::updateTimer()
 {
-	framesWaited ++;
+	//framesWaited ++;
+	movementTimer ++;
+	shakeTimer ++;
 
-	if (framesWaited >= cameraPause)
+	if (movementTimer >= cameraPause)
 	{
 		newMoveToPoint(followedObject);
-		framesWaited = 0;
+		movementTimer = 0;
 	}
+
+	if (shakeTimer >= shakeDelay)
+	{
+		shakeDelay = randomNumber(0, shakeDelayRange)*FPS;
+		changeMotion();
+		shakeTimer = 0;
+	}
+}
+
+
+void Camera::changeMotion()
+{
+	additionalMotionX = randomNumber(-motion, motion);
+	additionalMotionY = randomNumber(-motion, motion);
 }
 
 
@@ -153,19 +145,21 @@ void Camera::newMoveToPoint(Sprite *sprite)
 	double zoomDiff = zoomToPoint + ((zoom-zoomToPoint)/2);
 	followedObject = sprite;
 
-	moveToPointX = ((sprite->getMidX()*zoom)-0.5*SCREEN_WIDTH) + randomNumber(-motion, motion);
-	moveToPointY = ((sprite->getMidY()*zoom)-0.5*SCREEN_HEIGHT) + randomNumber(-motion, motion);
+	moveToPointX = ((sprite->getMidX()*zoom)-0.5*SCREEN_WIDTH) + additionalMotionX;
+	moveToPointY = ((sprite->getMidY()*zoom)-0.5*SCREEN_HEIGHT) + additionalMotionY;
 }
 
 
 
-void Camera::newZoom(double newZoom, double speed, double maxSpeed, double accuracy)
+double Camera::lerp(double x, double t, double y)
+{
+	return x * (1-t) + y*t;
+}
+
+
+void Camera::newZoom(double newZoom)
 {
 	zoomToPoint = newZoom;
-
-	zoomSpeed = speed;
-	zoomMaxSpeed = maxSpeed;
-	zoomAccuracy = accuracy;
 }
 
 

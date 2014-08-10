@@ -27,7 +27,7 @@ using namespace std;
 SDL_Event evt;					// Event variable
 SDL_Window *window = NULL;		// The game window to render images to
 SDL_Renderer *renderer = NULL;	// Used to render all the game objects
-double zoom = 5;				// Tracks current game magnification
+double zoom = 1;				// Tracks current game magnification
 double xOffset = 0,				// Screen position relative to objects
 	   yOffset = 0;
 int mapWidthInPixels,			// Not useful here, remove this from here and camera.cpp later
@@ -91,7 +91,7 @@ int main(int argc, char *args[])
 
 	Camera camera;
 	camera.setfollowedObject(chips[controlledChip]);
-	camera.newZoom(5, 0.01, 0.5, 0.1);
+	camera.newZoom(1);
 
 	// Create a temporary tile map test
 	TileMap theMap;
@@ -122,23 +122,27 @@ int main(int argc, char *args[])
 					case SDLK_ESCAPE:
 						quit = true;
 						break;
+					case SDLK_w:
 					case SDLK_UP:
 						keys[UP] = true;
 						break;
+					case SDLK_s:
 					case SDLK_DOWN:
 						keys[DOWN] = true;
 						break;
+					case SDLK_a:
 					case SDLK_LEFT:
 						keys[LEFT] = true;
 						break;
 					case SDLK_RIGHT:
+					case SDLK_d:
 						keys[RIGHT] = true;
 						break;
 					case SDLK_LEFTBRACKET:
-						camera.newZoom(zoom+(zoom/2), 0.01, 0.5, 0.1);
+						camera.newZoom(zoom-(zoom/2));
 						break;
 					case SDLK_RIGHTBRACKET:
-						camera.newZoom(zoom+(zoom/2), 0.01, 0.5, 0.1);
+						camera.newZoom(zoom+(zoom/2));
 				}
 			}
 			else if (evt.type == SDL_KEYUP)		// Key Up events
@@ -148,15 +152,19 @@ int main(int argc, char *args[])
 					case SDLK_ESCAPE:
 						quit = true;
 						break;
+					case SDLK_w:
 					case SDLK_UP:
 						keys[UP] = false;
 						break;
+					case SDLK_s:
 					case SDLK_DOWN:
 						keys[DOWN] = false;
 						break;
+					case SDLK_a:
 					case SDLK_LEFT:
 						keys[LEFT] = false;
 						break;
+					case SDLK_d:
 					case SDLK_RIGHT:
 						keys[RIGHT] = false;
 						break;
@@ -164,7 +172,7 @@ int main(int argc, char *args[])
 			}
 			else if (evt.type == SDL_MOUSEWHEEL)	// MouseWheel event
 			{
-				camera.newZoom(zoom+(evt.wheel.y*(zoom/2)), 0.01, 0.5, 0.1);
+				camera.newZoom(zoom+(evt.wheel.y*(zoom/2)));
 			}
 		}
 
@@ -209,7 +217,7 @@ int main(int argc, char *args[])
 		SDL_RenderClear(renderer);						// Clear screen graphics
 
 
-		//theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
+		theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
 
 		for (int i=0; i<chipLayers; i++)	// Draw chips
 		{

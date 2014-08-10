@@ -9,39 +9,33 @@
 class Camera
 {
 	private:
-		double vx, vy,speed, maxSpeed, friction, cameraPause,
-			zoomVelocity, zoomSpeed, zoomMaxSpeed, zoomAccuracy, zoomToPoint;
-		int width, height, moveToPointX, moveToPointY,
-			accuracy, motion;
-		int framesWaited;
+		double cameraPause, shakeDelayRange, shakeDelay, zoomToPoint, moveToPointX, moveToPointY, 
+			lerpAmt, zoomLerp, xScroll, yScroll, zoomScroll,
+			additionalMotionX, additionalMotionY;
+		int motion, framesWaited, movementTimer, shakeTimer;
 		Sprite *followedObject;
 
 		void updateZoom();
 		void scrollScreen();
 		void updateTimer();
 		void newMoveToPoint(Sprite *sprite);
+		void changeMotion();
+		double lerp(double A, double t, double B);
 		double randomNumber(double Min, double Max);
 
 	public:
 		Camera();
 		~Camera();
 		void updateCamera();
-		void newZoom(double newZoom, double speed, double maxSpeed, double accuracy);
+		void newZoom(double newZoom);
 
-		double getSpeed() {return speed;}
 		double getCameraPause() {return cameraPause;}
-		int   getAccuracy() {return accuracy;}
 		int   getMotion() {return motion;}
 		int   getMoveToPointX() {return moveToPointX;}
 		int   getMoveToPointY() {return moveToPointY;}
 
-		void setSpeed(double newSpeed) {speed = newSpeed;}
-		void setMaxSpeed(double newMax) {maxSpeed = newMax;}
 		void setCameraPause(double newPause) {cameraPause = newPause*FPS;}
-		void setAccuracy(int newAccuracy) {accuracy = newAccuracy;}
 		void setMotion(int newMotion) {motion = newMotion;}
-		void setZoomVelocity(double newVel) {zoomVelocity = newVel;}
-		void setFriction (double newFric) {friction = newFric;}
 		void setfollowedObject (Sprite* object) {followedObject = object;}
 };
 
