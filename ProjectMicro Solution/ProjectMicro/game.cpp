@@ -233,6 +233,14 @@ int main(int argc, char *args[])
 			chips[i]->draw(renderer);
 		}
 
+		// Render Camera focal point
+		SDL_Rect cameraPoint = {(camera.getMoveToPointX()+SCREEN_WIDTH/2)-xOffset-1, (camera.getMoveToPointY()+SCREEN_HEIGHT/2)-yOffset-1, 2, 2}; 
+		SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+		SDL_RenderFillRect(renderer, &cameraPoint);
+		
+		SDL_Rect accuracyBox = {((camera.getMoveToPointX()+SCREEN_WIDTH/2)-xOffset)-camera.getMotion(), 
+			((camera.getMoveToPointY()+SCREEN_HEIGHT/2)-yOffset)-camera.getMotion(), camera.getMotion()*2, camera.getMotion()*2};
+		SDL_RenderDrawRect(renderer, &accuracyBox);
 
 		SDL_RenderPresent(renderer);	// Display renderer to the screen
 	} // END while(!quit)

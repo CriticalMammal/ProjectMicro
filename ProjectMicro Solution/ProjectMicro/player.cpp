@@ -50,6 +50,11 @@ Player::Player()
 	maxSpeed = 1;
 	oldMaxSpeed = maxSpeed;
 
+	randomColor.r = randomNumber(0, 255);
+	randomColor.g = randomNumber(0, 255);
+	randomColor.b = randomNumber(0, 255);
+	randomColor.a = 255;
+
 
 
 	//create motherboard
@@ -178,10 +183,14 @@ void Player::handleKeys()
 
 void Player::updateCollisionRects()
 {
-	playerRect.x = x*zoom-xOffset;
-	playerRect.y = y*zoom-yOffset;
+	//playerRect.x = x*zoom-xOffset;
+	//playerRect.y = y*zoom-yOffset;
 	playerRect.w = width*zoom;
 	playerRect.h = height*zoom;
+	playerRect.x = x-xOffset - (width*zoom/2);
+	playerRect.y = y-yOffset - (height*zoom/2);
+	//playerRect.x = (x*zoom - xOffset) + (SCREEN_WIDTH/2);
+	//playerRect.y = (y*zoom - yOffset) + (SCREEN_HEIGHT/2);
 
 	collisionRect.x = x;
 	collisionRect.y = y;
@@ -234,12 +243,15 @@ void Player::updateMotherboard()
 	// Keep this
 	motherBoard.setX(x*zoom-xOffset);
 	motherBoard.setY(y*zoom-yOffset);
+
+	//motherBoard.setX(width*zoom/2);
+	//motherBoard.setY(height*zoom/2);
 } // END updateMotherboard()
 
 
 void Player::draw(SDL_Renderer *renderer)
 {
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer, randomColor.r, randomColor.g, randomColor.b, 255);
 	SDL_RenderFillRect(renderer, &playerRect);
 
 
@@ -254,6 +266,6 @@ void Player::draw(SDL_Renderer *renderer)
 	}
 	*/
 
-	SDL_Rect screenRect = {xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT};
+	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	motherBoard.drawTileMap(screenRect, renderer);
 } // END draw()

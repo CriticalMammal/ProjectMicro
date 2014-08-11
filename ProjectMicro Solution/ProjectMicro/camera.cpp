@@ -87,9 +87,6 @@ void Camera::updateZoom()
 //scroll camera/screen towards the defined moveTo coordinates
 void Camera::scrollScreen()
 {
-	//xOffset += zoomVelocity*followedObject->getMidX();
-	//yOffset += zoomVelocity*followedObject->getMidY();
-
 	if (xOffset != moveToPointX && yOffset != moveToPointY)
 	{
 		lerpAmt = 0;
@@ -142,11 +139,13 @@ void Camera::changeMotion()
 // Called every (cameraPause) seconds
 void Camera::newMoveToPoint(Sprite *sprite)
 {
-	double zoomDiff = zoomToPoint + ((zoom-zoomToPoint)/2);
 	followedObject = sprite;
 
-	moveToPointX = ((sprite->getMidX()*zoom)-0.5*SCREEN_WIDTH) + additionalMotionX;
-	moveToPointY = ((sprite->getMidY()*zoom)-0.5*SCREEN_HEIGHT) + additionalMotionY;
+	moveToPointX = ((sprite->getMidX())-0.5*SCREEN_WIDTH) + additionalMotionX;
+	moveToPointY = ((sprite->getMidY())-0.5*SCREEN_HEIGHT) + additionalMotionY;
+
+	//moveToPointX = sprite->getMidX()*zoom + additionalMotionX;
+	//moveToPointY = sprite->getMidY()*zoom + additionalMotionY;
 }
 
 

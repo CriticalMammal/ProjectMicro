@@ -10,7 +10,7 @@ class Camera
 {
 	private:
 		double cameraPause, shakeDelayRange, shakeDelay, zoomToPoint, moveToPointX, moveToPointY, 
-			lerpAmt, zoomLerp, xScroll, yScroll, zoomScroll,
+			lerpAmt, zoomLerp, xScroll, yScroll, zoomScroll, 
 			additionalMotionX, additionalMotionY;
 		int motion, framesWaited, movementTimer, shakeTimer;
 		Sprite *followedObject;

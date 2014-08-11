@@ -7,6 +7,7 @@ class Player : public Sprite
 		int collisionPad;
 		SDL_Rect playerRect; //used to draw the player square
 		SDL_Texture* tempTexture;
+		SDL_Color randomColor;
 
 		//motherboard variables (tileMap inside this chip)
 		int boardCapacity;
