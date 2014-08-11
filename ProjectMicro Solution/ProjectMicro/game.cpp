@@ -56,7 +56,7 @@ int main(int argc, char *args[])
 
 	// Initialize Variables
 	bool quit = false;		// Track when to quit the game
-	int chipLayers = 2;		// How many chips there will be
+	int chipLayers = 4;		// How many chips there will be
 	vector<Player*> chips;	// Vector to contain player chips
 
 	// Temp player chip implementation
@@ -69,25 +69,32 @@ int main(int argc, char *args[])
 	oldW = chipStartW;
 	oldH = chipStartH;
 
+	double shrinkRate = 12;
+	double shrinkSizeModifier = 8.4;
+
 	for (int i=0; i<chipLayers; i++)
 	{
 		chips.push_back(new Player);
-		chips.back()->setX(oldX+(oldW/15));
-		chips.back()->setY(oldY+(oldH/15));
-		chips.back()->setWidth(oldW/15);
-		chips.back()->setHeight(oldH/15);
+		chips.back()->setX(oldX+(oldW/shrinkRate));
+		chips.back()->setY(oldY+(oldH/shrinkRate));
+		chips.back()->setWidth(oldW/shrinkSizeModifier);
+		chips.back()->setHeight(oldH/shrinkSizeModifier);
 		chips.back()->initializeBoard(*renderer);
 
-		oldX = oldX+(oldW/15);
-		oldY = oldY+(oldH/15);
-		oldW = oldW/15;
-		oldH = oldH/15;
+		oldX = oldX+(oldW/shrinkRate);
+		oldY = oldY+(oldH/shrinkRate);
+		oldW = oldW/shrinkSizeModifier;
+		oldH = oldH/shrinkSizeModifier;
 	}
 
-	if (zoom <= 1)
-		controlledChip = 0;
-	else if (zoom > 1 && zoom < 10)
-		controlledChip = 1;
+	// Set player control to specific chip
+	for (int i=0; i<chipLayers; i++)
+	{
+		if (zoom >= shrinkRate*i && zoom <= shrinkRate*(i+1))
+		{
+			controlledChip = i;
+		}
+	}
 
 	Camera camera;
 	camera.setfollowedObject(chips[controlledChip]);
@@ -186,12 +193,14 @@ int main(int argc, char *args[])
 		camera.setfollowedObject(chips[controlledChip]);
 		camera.updateCamera();
 
-
-		if (zoom <= 1)
-			controlledChip = 0;
-		else if (zoom > 1 && zoom < 10)
-			controlledChip = 1;
-
+		// Set player control to specific chip
+		for (int i=0; i<chipLayers; i++)
+		{
+			if (zoom >= shrinkRate*i && zoom <= shrinkRate*(i+1))
+			{
+				controlledChip = i;
+			}
+		}
 
 		for (int i=0; i<chipLayers; i++)
 		{
@@ -217,7 +226,7 @@ int main(int argc, char *args[])
 		SDL_RenderClear(renderer);						// Clear screen graphics
 
 
-		theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
+		//theMap.drawTileMap(screenRect, renderer);	// Draw temporary map
 
 		for (int i=0; i<chipLayers; i++)	// Draw chips
 		{

@@ -35,7 +35,7 @@ TileMap::~TileMap()
 
 
 
-void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, int blockHeight, int blockWidth, SDL_Renderer *renderer)
+void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, double blockHeight, double blockWidth, SDL_Renderer *renderer)
 {
 	mapFileName = fileLocation;
 	mapH = mapHeight;
@@ -169,26 +169,24 @@ void TileMap::updateTileRects()
 	float adjBlockW = blockW*zoom;
 	float adjBlockH = blockH*zoom;
 
-	int rowLength = mapW;
-
 
 	// Update Tile rect positions
-	for (int i=0; i<tileMap.size()-1; i+=mapW) // Had to do size()-1 for some reason? shouldn't this be even?
+	for (int i=0; i<tileMap.size()-1; i++)
 	{
-
-		for (int w = i; w<rowLength; w++) 
+		for (int w = 0; w<mapW; w++)
 		{
-			tileRects[w].x = realX;
-			tileRects[w].y = realY;
-			tileRects[w].w = adjBlockW+tilePad;
-			tileRects[w].h = adjBlockH+tilePad;
+			tileRects[i].x = realX;
+			tileRects[i].y = realY;
+			tileRects[i].w = adjBlockW+tilePad;
+			tileRects[i].h = adjBlockH+tilePad;
 
 			realX += adjBlockW;
+			i++;
 		}
 
-		realX = orgRealX;
+		realX = x;
 		realY += adjBlockH;
-		rowLength += mapW;
+		i--;
 	}
 }
 
@@ -198,7 +196,13 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 {
 	updateTileRects(); // Temporary, shouldn't call this from draw()
 
-	vector<int> tilesToDraw = getTilesInRect(screenRect);
+	vector<int> tilesToDraw;
+	//tilesToDraw = getTilesInRect(screenRect);
+
+	for (int i=0; i<tileMap.size()-1; i++)
+	{
+		tilesToDraw.push_back(i);
+	}
 
 	if (tilesToDraw.size() <= 0)
 	{

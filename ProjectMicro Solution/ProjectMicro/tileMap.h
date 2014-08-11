@@ -11,8 +11,8 @@ class TileMap
 		std::vector<int> tileMap;
 		std::vector<SDL_Rect> tileRects;
 		std::string mapFileName;
-		int mapH, mapW, blockH, blockW, tilePad;
-		double x, y;
+		int mapH, mapW, tilePad;
+		double x, y, blockH, blockW;
 		//SDL_Renderer *renderer;
 
 		SDL_Texture* loadTexture(std::string, SDL_Surface*, SDL_Renderer *renderer);
@@ -27,7 +27,7 @@ class TileMap
 		TileMap();
 		~TileMap();
 
-		void initialize(std::string fileLocation, int mapHeight, int mapWidth, int blockHeight, int blockWidth, SDL_Renderer *renderer);
+		void initialize(std::string fileLocation, int mapHeight, int mapWidth, double blockHeight, double blockWidth, SDL_Renderer *renderer);
 		void drawTileMap(SDL_Rect, SDL_Renderer *renderer);
 
 		//finds tile at x/y coordinates and then returns

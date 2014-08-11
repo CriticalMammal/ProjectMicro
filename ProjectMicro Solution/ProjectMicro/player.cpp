@@ -75,19 +75,21 @@ Player::Player()
 			boardGrid.push_back(tempRect);
 
 			gridX += blockWidth;
+			i++;
 		}
 
 		gridY += blockHeight;
 		gridX = boardX;
+		i--;
 	}
 	*/
-
+	
 	boardWidth = 10;
 	boardHeight = boardWidth;
 	boardCapacity = boardWidth*boardHeight;
 	boardX = x;
 	boardY = y;
-
+	
 } //END Player()
 
 Player::~Player()
@@ -229,6 +231,7 @@ void Player::updateMotherboard()
 	}
 	*/
 
+	// Keep this
 	motherBoard.setX(x*zoom-xOffset);
 	motherBoard.setY(y*zoom-yOffset);
 } // END updateMotherboard()
