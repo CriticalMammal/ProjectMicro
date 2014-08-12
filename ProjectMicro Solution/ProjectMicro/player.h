@@ -23,6 +23,7 @@ class Player : public Sprite
 	public:
 		Player();
 		~Player();
+		void initializeChip(double xIn, double yIn, double wIn, double hIn);
 		void initializeBoard(SDL_Renderer &renderer);
 		void update();
 		void handleKeys();
@@ -31,6 +32,8 @@ class Player : public Sprite
 		//player rect is the square drawn to represent
 		//the character
 		SDL_Rect getPlayerRect() {return playerRect;}
+		double getBlockW() {return (double)width/(double)boardWidth;}
+		double getBlockH() {return (double)height/(double)boardHeight;}
 };
 
 #endif

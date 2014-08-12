@@ -135,7 +135,6 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 		if (tileTraitFile.is_open())
 		{
 			getline(tileTraitFile, traitLine);
-			cout << traitLine << endl;
 		}
 		else cout << "Unable to open file";
 
@@ -145,7 +144,6 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 		blocks.back()->setTrait3(traitLine[3] - '0');
 		blocks.back()->setTrait4(traitLine[4] - '0');
 
-		cout << traitLine[1] << endl << endl;
 		//use this when you expand the functionality to handle longer digits than 0-9
 		//cout << atoi(traitLine.c_str()) << endl << endl;
 	}

@@ -14,12 +14,21 @@ extern double xOffset, yOffset, zoom;
 //extern SDL_Renderer* renderer;
 
 Player::Player()
-{
-	x = 60*zoom;
-	y = 60*zoom;
+{	
 
-	width = 10;
-	height = 10;
+}
+
+Player::~Player()
+{
+
+}
+
+void Player::initializeChip(double xIn, double yIn, double wIn, double hIn)
+{
+	x = xIn;
+	y = yIn;
+	width = wIn;
+	height = hIn;
 
 	playerRect.x = (x*zoom-xOffset);
 	playerRect.y = (y*zoom-yOffset);
@@ -54,52 +63,12 @@ Player::Player()
 	randomColor.g = randomNumber(0, 255);
 	randomColor.b = randomNumber(0, 255);
 	randomColor.a = 255;
-
-
-
-	//create motherboard
-	/*
-	boardWidth = 4;
+	
+	boardWidth = 20;
 	boardHeight = boardWidth;
 	boardCapacity = boardWidth*boardHeight;
 	boardX = x;
 	boardY = y;
-
-	double blockWidth = (double)width/(double)boardWidth;
-	double blockHeight = (double)height/(double)boardHeight;
-
-	std::cout << "blockWidth: " << blockWidth << std::endl;
-
-	double gridX = boardX, gridY = boardY;
-
-	for (int i=0; i<boardCapacity; i++)
-	{
-		for (int w=0; w<boardWidth; w++)
-		{
-			SDL_Rect tempRect = {gridX, gridY, blockWidth, blockHeight};
-			boardGrid.push_back(tempRect);
-
-			gridX += blockWidth;
-			i++;
-		}
-
-		gridY += blockHeight;
-		gridX = boardX;
-		i--;
-	}
-	*/
-	
-	boardWidth = 10;
-	boardHeight = boardWidth;
-	boardCapacity = boardWidth*boardHeight;
-	boardX = x;
-	boardY = y;
-	
-} //END Player()
-
-Player::~Player()
-{
-
 }
 
 
@@ -207,61 +176,20 @@ void Player::updateCollisionRects()
 
 void Player::updateMotherboard()
 {
-	// Old board grid implementation
-	/*
-	boardX = x;
-	boardY = y;
-
-	double blockWidth = (double)width/(double)boardWidth;
-	double blockHeight = (double)height/(double)boardHeight;
-
-	double gridX = boardX, gridY = boardY;
-
-	for (int i=0; i<boardCapacity; i++)
-	{
-		for (int w=0; w<boardWidth; w++)
-		{
-			boardGrid[i].x = (gridX*zoom)-xOffset;
-			boardGrid[i].y = (gridY*zoom)-yOffset;
-			boardGrid[i].w = blockWidth*zoom;
-			boardGrid[i].h = blockHeight*zoom;
-
-			gridX += blockWidth;
-			i++;
-		}
-
-		gridY += blockHeight;
-		gridX = boardX;
-		i--;
-	}
-	*/
-
 	// Keep this
 	motherBoard.setX(x*zoom - xOffset*zoom + SCREEN_WIDTH/2);
 	motherBoard.setY(y*zoom - yOffset*zoom + SCREEN_HEIGHT/2);
 
-	//motherBoard.setX(width*zoom/2);
-	//motherBoard.setY(height*zoom/2);
 } // END updateMotherboard()
 
 
 void Player::draw(SDL_Renderer *renderer)
 {
+	// Draw Chip Background
 	SDL_SetRenderDrawColor(renderer, randomColor.r, randomColor.g, randomColor.b, 255);
 	SDL_RenderFillRect(renderer, &playerRect);
 
-
-
-	//draw grid
-	/*
-	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
-	for (int i=0; i<boardCapacity; i++)
-	{
-		SDL_RenderDrawRect(renderer, &boardGrid[i]);
-	}
-	*/
-
+	// Draw Motherboard
 	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	motherBoard.drawTileMap(screenRect, renderer);
 } // END draw()

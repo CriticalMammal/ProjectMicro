@@ -62,29 +62,40 @@ int main(int argc, char *args[])
 	// Temp player chip implementation
 	int controlledChip = 0;
 	double chipStartX = 60*zoom, chipStartY = 60*zoom, 
-		chipStartW = 600, chipStartH = 600;
-	double oldX, oldY, oldW, oldH;
+		chipStartW = 100, chipStartH = 100;
+	double oldX, oldY, oldW, oldH, newW, newH;
 	oldX = chipStartX;
 	oldY = chipStartY;
 	oldW = chipStartW;
-	oldH = chipStartH;
+	oldH = chipStartH;	
 
 	double shrinkRate = 12;
 	double shrinkSizeModifier = 8.4;
 
-	for (int i=0; i<chipLayers; i++)
+	for (int i=0; i<=chipLayers; i++)
 	{
+		if (i == 0)
+		{
+			newW = oldW;
+			newH = oldH;
+		}
+		else
+		{
+			newW = chips.back()->getBlockW();
+			newH = chips.back()->getBlockH();
+
+			cout << newW << endl;
+		}
+
 		chips.push_back(new Player);
-		chips.back()->setX(oldX+(oldW/shrinkRate));
-		chips.back()->setY(oldY+(oldH/shrinkRate));
-		chips.back()->setWidth(oldW/shrinkSizeModifier);
-		chips.back()->setHeight(oldH/shrinkSizeModifier);
+		chips.back()->initializeChip(oldX+(oldW/shrinkRate), 
+			oldY+(oldH/shrinkRate), newW, newH);
 		chips.back()->initializeBoard(*renderer);
 
 		oldX = oldX+(oldW/shrinkRate);
 		oldY = oldY+(oldH/shrinkRate);
-		oldW = oldW/shrinkSizeModifier;
-		oldH = oldH/shrinkSizeModifier;
+		oldW = newW;
+		oldH = newH;
 	}
 
 	// Set player control to specific chip
@@ -151,9 +162,11 @@ int main(int argc, char *args[])
 						break;
 					case SDLK_LEFTBRACKET:
 						camera.newZoom(zoom-(zoom/2));
+						cout << "zoom = " << zoom-(zoom/2) << endl;
 						break;
 					case SDLK_RIGHTBRACKET:
 						camera.newZoom(zoom+(zoom/2));
+						cout << "zoom = " << zoom+(zoom/2) << endl;
 				}
 			}
 			else if (evt.type == SDL_KEYUP)		// Key Up events
