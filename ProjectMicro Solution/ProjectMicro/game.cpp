@@ -101,11 +101,7 @@ int main(int argc, char *args[])
 	// Set player control to specific chip
 	for (int i=0; i<chipLayers; i++)
 	{
-		if (i+1 >= chipLayers)	// If it's the last layer
-		{
-			controlledChip = i;
-		}
-		else if (zoom >= shrinkRate*i && zoom <= shrinkRate*(i+1))
+		if (chips[i]->getWidth()*zoom >= 20)
 		{
 			controlledChip = i;
 		}
@@ -213,7 +209,7 @@ int main(int argc, char *args[])
 		// Set player control to specific chip
 		for (int i=0; i<chipLayers; i++)
 		{
-			if (zoom >= shrinkRate*i && zoom <= shrinkRate*(i+1))
+			if (chips[i]->getWidth()*zoom >= 20)
 			{
 				controlledChip = i;
 			}

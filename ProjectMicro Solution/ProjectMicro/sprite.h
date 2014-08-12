@@ -29,8 +29,8 @@ class Sprite
 		double getMidX() {return x + 0.5f*width;}
 		double getMidY() {return y + 0.5f*height;}
 		double getSpeed() {return speed;}
-		int getWidth() {return width;}
-		int getHeight() {return height;}
+		double getWidth() {return width;}
+		double getHeight() {return height;}
 		double getvx() {return vx;}
 		double getvy() {return vy;}
 		SDL_Rect getCollisionRect() {return collisionRect;}
@@ -41,8 +41,8 @@ class Sprite
 		void setY(double newY) {y = newY;}
 		void setVx(double newVx){vx = newVx;}
 		void setVy(double newVy){vy = newVy;}
-		void setWidth(int newW){width = newW;}
-		void setHeight(int newH){height = newH;}
+		void setWidth(double newW){width = newW;}
+		void setHeight(double newH){height = newH;}
 
 		void updatePos();
 		double randomNumber(double, double);
