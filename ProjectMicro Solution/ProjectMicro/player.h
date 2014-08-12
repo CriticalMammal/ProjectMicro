@@ -15,15 +15,16 @@ class Player : public Sprite
 		double boardX, boardY;
 
 		std::vector<SDL_Rect> boardGrid;
-		TileMap motherBoard;
 
 		void updateCollisionRects();
 		void updateMotherboard();
 
 	public:
+		TileMap motherBoard;
+
 		Player();
 		~Player();
-		void initializeChip(double xIn, double yIn, double wIn, double hIn);
+		void initializeChip(double xIn, double yIn, double wIn, double hIn, double newSpeed);
 		void initializeBoard(SDL_Renderer &renderer);
 		void update();
 		void handleKeys();
@@ -32,8 +33,8 @@ class Player : public Sprite
 		//player rect is the square drawn to represent
 		//the character
 		SDL_Rect getPlayerRect() {return playerRect;}
-		double getBlockW() {return (double)width/(double)boardWidth;}
-		double getBlockH() {return (double)height/(double)boardHeight;}
+		double getBlockW();
+		double getBlockH();
 };
 
 #endif

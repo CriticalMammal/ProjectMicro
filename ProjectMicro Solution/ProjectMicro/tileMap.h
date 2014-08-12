@@ -39,9 +39,13 @@ class TileMap
 		std::vector<pathCoord> pathFind(double startX, double startY, double endX, double endY);
 		void saveMapFile();
 
+		double getBlockW() {return blockW;}
+		double getBlockH() {return blockH;}
 
 		void setX(int newX) {x = newX;}
 		void setY(int newY) {y = newY;}
+		void setBlockW(double newW) {blockW = newW;}
+		void setBlockH(double newH) {blockH = newH;}
 
 		std::vector<Tile*> getBlocks() {return blocks;}
 };

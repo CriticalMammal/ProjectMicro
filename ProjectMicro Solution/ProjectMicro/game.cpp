@@ -56,14 +56,14 @@ int main(int argc, char *args[])
 
 	// Initialize Variables
 	bool quit = false;		// Track when to quit the game
-	int chipLayers = 4;		// How many chips there will be
+	int chipLayers = 5;		// How many chips there will be
 	vector<Player*> chips;	// Vector to contain player chips
 
 	// Temp player chip implementation
 	int controlledChip = 0;
 	double chipStartX = 60*zoom, chipStartY = 60*zoom, 
 		chipStartW = 100, chipStartH = 100;
-	double oldX, oldY, oldW, oldH, newW, newH;
+	double oldX, oldY, oldW, oldH, newW, newH, newSpeed;
 	oldX = chipStartX;
 	oldY = chipStartY;
 	oldW = chipStartW;
@@ -78,18 +78,18 @@ int main(int argc, char *args[])
 		{
 			newW = oldW;
 			newH = oldH;
+			newSpeed = 0.1;
 		}
 		else
 		{
 			newW = chips.back()->getBlockW();
 			newH = chips.back()->getBlockH();
-
-			cout << newW << endl;
+			newSpeed = chips.back()->getSpeed()/shrinkRate;
 		}
 
 		chips.push_back(new Player);
 		chips.back()->initializeChip(oldX+(oldW/shrinkRate), 
-			oldY+(oldH/shrinkRate), newW, newH);
+			oldY+(oldH/shrinkRate), newW, newH, newSpeed);
 		chips.back()->initializeBoard(*renderer);
 
 		oldX = oldX+(oldW/shrinkRate);
@@ -221,9 +221,13 @@ int main(int argc, char *args[])
 
 		for (int i=0; i<chipLayers; i++)
 		{
-			if (i >= controlledChip)
+			if (i == controlledChip)
 			{
 				chips[i]->handleKeys();
+			}
+			else if (i >= controlledChip)
+			{
+				// Move this like the chip above
 			}
 
 			chips[i]->update();

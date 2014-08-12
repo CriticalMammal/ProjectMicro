@@ -12,7 +12,8 @@ class Sprite
 		double x, y, midX, midY, oldX, oldY, vx, vy,
 			  speed, friction, maxSpeed,
 			  oldMaxSpeed;
-		int width, height, orgWidth, orgHeight;
+		double width, height, orgWidth, orgHeight;
+		//int width, height, orgWidth, orgHeight;
 		SDL_Rect collisionRect;
 		SDL_Rect collisionVert;
 		SDL_Rect collisionHorz;

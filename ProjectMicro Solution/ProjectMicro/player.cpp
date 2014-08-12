@@ -23,7 +23,7 @@ Player::~Player()
 
 }
 
-void Player::initializeChip(double xIn, double yIn, double wIn, double hIn)
+void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, double newSpeed)
 {
 	x = xIn;
 	y = yIn;
@@ -55,7 +55,7 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn)
 	vx = 0;
 	vy = 0;
 	friction = 0.8;
-	speed = 0.1;
+	speed = newSpeed;;
 	maxSpeed = 1;
 	oldMaxSpeed = maxSpeed;
 
@@ -180,6 +180,12 @@ void Player::updateMotherboard()
 	motherBoard.setX(x*zoom - xOffset*zoom + SCREEN_WIDTH/2);
 	motherBoard.setY(y*zoom - yOffset*zoom + SCREEN_HEIGHT/2);
 
+	if (motherBoard.getBlockW() == 0 || motherBoard.getBlockH() == 0)
+	{
+		motherBoard.setBlockW((double)width/(double)boardWidth);
+		motherBoard.setBlockH((double)height/(double)boardHeight);
+	}
+
 } // END updateMotherboard()
 
 
@@ -193,3 +199,13 @@ void Player::draw(SDL_Renderer *renderer)
 	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	motherBoard.drawTileMap(screenRect, renderer);
 } // END draw()
+
+double Player::getBlockW() 
+{
+	return (double)width*zoom/(double)boardWidth;
+}
+
+double Player::getBlockH()
+{
+	return (double)height*zoom/(double)boardHeight;
+}
