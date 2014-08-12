@@ -183,14 +183,10 @@ void Player::handleKeys()
 
 void Player::updateCollisionRects()
 {
-	//playerRect.x = x*zoom-xOffset;
-	//playerRect.y = y*zoom-yOffset;
+	playerRect.x = x*zoom - xOffset*zoom + SCREEN_WIDTH/2;
+	playerRect.y = y*zoom - yOffset*zoom + SCREEN_HEIGHT/2;
 	playerRect.w = width*zoom;
 	playerRect.h = height*zoom;
-	playerRect.x = x-xOffset - (width*zoom/2);
-	playerRect.y = y-yOffset - (height*zoom/2);
-	//playerRect.x = (x*zoom - xOffset) + (SCREEN_WIDTH/2);
-	//playerRect.y = (y*zoom - yOffset) + (SCREEN_HEIGHT/2);
 
 	collisionRect.x = x;
 	collisionRect.y = y;
@@ -241,8 +237,8 @@ void Player::updateMotherboard()
 	*/
 
 	// Keep this
-	motherBoard.setX(x*zoom-xOffset);
-	motherBoard.setY(y*zoom-yOffset);
+	motherBoard.setX(x*zoom - xOffset*zoom + SCREEN_WIDTH/2);
+	motherBoard.setY(y*zoom - yOffset*zoom + SCREEN_HEIGHT/2);
 
 	//motherBoard.setX(width*zoom/2);
 	//motherBoard.setY(height*zoom/2);

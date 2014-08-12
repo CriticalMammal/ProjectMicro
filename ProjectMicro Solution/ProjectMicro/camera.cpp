@@ -47,6 +47,7 @@ Camera::Camera()
 	yScroll = yOffset;
 
 	zoomScroll = zoom;
+	lastZoom = zoom;
 }
 
 
@@ -68,6 +69,8 @@ void Camera::updateCamera()
 
 void Camera::updateZoom()
 {
+	lastZoom = zoom;
+
 	if (zoom != zoomToPoint)
 	{
 		zoomLerp = 0.0;
@@ -141,11 +144,8 @@ void Camera::newMoveToPoint(Sprite *sprite)
 {
 	followedObject = sprite;
 
-	moveToPointX = ((sprite->getMidX())-0.5*SCREEN_WIDTH) + additionalMotionX;
-	moveToPointY = ((sprite->getMidY())-0.5*SCREEN_HEIGHT) + additionalMotionY;
-
-	//moveToPointX = sprite->getMidX()*zoom + additionalMotionX;
-	//moveToPointY = sprite->getMidY()*zoom + additionalMotionY;
+	moveToPointX = sprite->getMidX();
+	moveToPointY = sprite->getMidY();
 }
 
 
