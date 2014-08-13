@@ -4,6 +4,7 @@
 
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <SDL_ttf.h>
 #include <iostream>
 #include <vector>
@@ -24,20 +25,18 @@ using namespace std;
 
 
 // Variable Definitions
-SDL_Event evt;					// Event variable
-SDL_Window *window = NULL;		// The game window to render images to
-SDL_Renderer *renderer = NULL;	// Used to render all the game objects
-double zoom = 1;				// Tracks current game magnification
-double xOffset = 0,				// Screen position relative to objects
-	   yOffset = 0;
-int mapWidthInPixels,			// Not useful here, remove this from here and camera.cpp later
-	mapHeightInPixels;
+SDL_Event evt;
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
+
+double zoom = 1;	// Tracks current game magnification
+double xOffset = 0, yOffset = 0;	// Screen position relative to objects
 bool keys[] = {false, false, false, false, false, false}; // Array to track key press booleans
 
 
 // Function Definitions 
-bool init();			// Initializes SDL parts
-void close();			// Destroys allocated memory and closes the game
+bool init();
+void close();	// Destroys allocated memory and closes the game
 
 
 
@@ -58,6 +57,20 @@ int main(int argc, char *args[])
 	bool quit = false;		// Track when to quit the game
 	int chipLayers = 5;		// How many chips there will be
 	vector<Player*> chips;	// Vector to contain player chips
+
+	// Load Audio
+	Mix_Chunk *bgMusic = NULL;
+	Mix_Chunk *whooshSound = NULL;
+
+	bgMusic = Mix_LoadWAV("audio/corsica_crussles.wav");
+	whooshSound = Mix_LoadWAV("audio/bigWhoosh.wav");
+
+	if (bgMusic == NULL || whooshSound == NULL)
+	{
+		cout << "Unable to load a sound. Mixer_ERROR: " << Mix_GetError() << endl;
+	}
+	int channel;
+	channel = Mix_FadeInChannel(-1, bgMusic, -1, 3000);
 
 	// Temp player chip implementation
 	int controlledChip = 0;
@@ -109,7 +122,8 @@ int main(int argc, char *args[])
 
 	Camera camera;
 	camera.setfollowedObject(chips[controlledChip]);
-	camera.newZoom(1);
+	zoom = 0.01;
+	camera.newZoom(zoom);
 
 	// Create a temporary tile map test
 	TileMap theMap;
@@ -207,11 +221,17 @@ int main(int argc, char *args[])
 		camera.updateCamera();
 
 		// Set player control to specific chip
-		for (int i=0; i<chipLayers; i++)
+		for (int i=chipLayers-1; i>-1; i--)
 		{
 			if (chips[i]->getWidth()*zoom >= 20)
 			{
-				controlledChip = i;
+				if (i != controlledChip)
+				{
+					channel = Mix_PlayChannel(-1, whooshSound, 0);
+					controlledChip = i;
+				}
+
+				i = 0;
 			}
 		}
 
@@ -254,7 +274,10 @@ int main(int argc, char *args[])
 	} // END while(!quit)
 
 
-
+	Mix_FadeOutChannel(channel, 1000);
+	while (Mix_Playing(channel) != 0);
+	Mix_FreeChunk(bgMusic);
+	Mix_FreeChunk(whooshSound);
 	close();	//cleans up allocated memory
 	return 0;
 } // END main()
@@ -266,7 +289,7 @@ int main(int argc, char *args[])
 bool init()
 {
 	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
 	{
 		printf("SDL Init failed. SDL_Error: %s\n", SDL_GetError());
 		return false;
@@ -305,6 +328,18 @@ bool init()
 		return false;
 	}
 
+	// Init Audio Mixer
+	int audio_rate = 22050;
+	uint16_t audio_format = AUDIO_S16SYS;
+	int audio_channels = 2;
+	int audio_buffers = 3000;
+
+	if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0)
+	{
+		cout << "Audio failed to initialize. SDL_ERROR: " << Mix_GetError() << endl;
+		return false;
+	}
+
 	return true;
 } // END init()
 
@@ -318,6 +353,8 @@ void close()
 	SDL_DestroyWindow(window);
 	renderer = NULL;
 	window = NULL;
+
+	Mix_CloseAudio();
 
 	TTF_Quit();
 	SDL_Quit();
