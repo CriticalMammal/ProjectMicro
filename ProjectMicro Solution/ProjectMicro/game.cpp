@@ -92,15 +92,17 @@ int main(int argc, char *args[])
 			newW = oldW;
 			newH = oldH;
 			newSpeed = 0.1;
+			chips.push_back(new Player);
 		}
 		else
 		{
 			newW = chips.back()->getBlockW();
 			newH = chips.back()->getBlockH();
 			newSpeed = chips.back()->getSpeed()/shrinkRate;
+			chips.back()->chip = new Player;
+			chips.push_back(chips.back()->chip);
 		}
 
-		chips.push_back(new Player);
 		chips.back()->initializeChip(oldX+(oldW/shrinkRate), 
 			oldY+(oldH/shrinkRate), newW, newH, newSpeed);
 		chips.back()->initializeBoard(*renderer);

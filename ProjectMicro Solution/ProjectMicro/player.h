@@ -1,6 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+//#include "sprite.h"
+//#include "player.h"
+
 class Player : public Sprite
 {
 	private:
@@ -21,6 +24,7 @@ class Player : public Sprite
 
 	public:
 		TileMap motherBoard;
+		Player *chip;
 
 		Player();
 		~Player();

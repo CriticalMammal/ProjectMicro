@@ -14,8 +14,8 @@ extern double xOffset, yOffset, zoom;
 //extern SDL_Renderer* renderer;
 
 Player::Player()
-{	
-
+{
+	
 }
 
 Player::~Player()
@@ -147,6 +147,18 @@ void Player::handleKeys()
 	oldY = y;
 	x += vx;
 	y += vy;
+
+	//update internal chip position (if it's here)
+	Player *chipReference;
+	chipReference = chip;
+
+	while (chipReference != NULL)
+	{
+		chipReference->setX(chipReference->getX()+vx);
+		chipReference->setY(chipReference->getY()+vy);
+
+		chipReference = chipReference->chip;
+	}
 } //END handleKeys()
 
 
@@ -197,7 +209,10 @@ void Player::draw(SDL_Renderer *renderer)
 
 	// Draw Motherboard
 	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-	motherBoard.drawTileMap(screenRect, renderer);
+	if (width*zoom > 2)
+	{
+		motherBoard.drawTileMap(screenRect, renderer);
+	}
 } // END draw()
 
 double Player::getBlockW() 
