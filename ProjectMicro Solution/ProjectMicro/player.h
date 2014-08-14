@@ -20,6 +20,7 @@ class Player : public Sprite
 		std::vector<SDL_Rect> boardGrid;
 
 		void updateCollisionRects();
+		void handleCollisions();
 		void updateMotherboard();
 
 	public:
@@ -29,7 +30,7 @@ class Player : public Sprite
 		Player();
 		~Player();
 		void initializeChip(double xIn, double yIn, double wIn, double hIn, double newSpeed);
-		void initializeBoard(SDL_Renderer &renderer);
+		void initializeBoard(SDL_Renderer &renderer, std::string mapTxtFile);
 		void update();
 		void handleKeys();
 		void draw(SDL_Renderer *renderer);

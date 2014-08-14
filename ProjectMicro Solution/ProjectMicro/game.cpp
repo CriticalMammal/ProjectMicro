@@ -105,8 +105,7 @@ int main(int argc, char *args[])
 
 		chips.back()->initializeChip(oldX+(oldW/shrinkRate), 
 			oldY+(oldH/shrinkRate), newW, newH, newSpeed);
-		chips.back()->initializeBoard(*renderer);
-
+		chips.back()->initializeBoard(*renderer, "mapFile.txt");
 		oldX = oldX+(oldW/shrinkRate);
 		oldY = oldY+(oldH/shrinkRate);
 		oldW = newW;
@@ -124,7 +123,7 @@ int main(int argc, char *args[])
 
 	Camera camera;
 	camera.setfollowedObject(chips[controlledChip]);
-	zoom = 0.01;
+	zoom = 1;
 	camera.newZoom(zoom);
 
 	// Create a temporary tile map test
@@ -242,10 +241,6 @@ int main(int argc, char *args[])
 			if (i == controlledChip)
 			{
 				chips[i]->handleKeys();
-			}
-			else if (i >= controlledChip)
-			{
-				// Move this like the chip above
 			}
 
 			chips[i]->update();

@@ -13,7 +13,6 @@ class Sprite
 			  speed, friction, maxSpeed,
 			  oldMaxSpeed;
 		double width, height, orgWidth, orgHeight;
-		//int width, height, orgWidth, orgHeight;
 		SDL_Rect collisionRect;
 		SDL_Rect collisionVert;
 		SDL_Rect collisionHorz;

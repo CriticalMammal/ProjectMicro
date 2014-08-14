@@ -253,8 +253,11 @@ int TileMap::getTileElementAt(int x, int y)
 {
 	//If you divide the coordinates by the width/height of each tile...
 	//you should be able to find out the element it would be in the vector
-	int tilesWide = x/blockW;
-	int tilesHigh = y/blockH;
+	double adjBlockW = blockW*zoom;
+	double adjBlockH = blockH*zoom;
+
+	int tilesWide = x/adjBlockW;
+	int tilesHigh = y/adjBlockH;
 
 	//each tilesHigh will be an entire row of tiles, aka the mapW
 	int tileElement = tilesHigh*mapW + tilesWide;
@@ -303,11 +306,16 @@ int TileMap::getTileTraitAt(int x, int y, int trait)
 // Expects rect1 to have proper perspective (zoom) applied
 vector<int> TileMap::getTilesInRect(SDL_Rect rect1)
 {
+	/*
+	cout << "map x: " << x << endl
+		 << "map y: " << y << endl;
+		 */
+
 	float adjBlockW = blockW*zoom;
 	float adjBlockH = blockH*zoom;
 
-	int tilesWide = rect1.x/adjBlockW;
-	int tilesHigh = rect1.y/adjBlockH;
+	double tilesWide = rect1.x/adjBlockW;
+	double tilesHigh = rect1.y/adjBlockH;
 
 	int elementWidth = (rect1.x+rect1.w)/adjBlockW;
 	int elementHeight = (rect1.y+rect1.h)/adjBlockH;
@@ -351,7 +359,17 @@ vector<int> TileMap::getTilesInRect(SDL_Rect rect1)
 bool TileMap::checkCollision(SDL_Rect rect1)
 {
 	vector<int> possibleCollidingTiles = getTilesInRect(rect1);
+	
+	/*
+	for (int c=0; c<possibleCollidingTiles.size(); c++)
+	{
+		std::cout << possibleCollidingTiles[c] << ", ";
+	}
+	std::cout << std::endl;
+	*/
 
+	
+	/*
 	//weird approach, you needed to find the x,y of an element in the tile array to
 	//get the collision rect. But it should be easier than this. The x/y etc. should
 	//probably be stored in each tile instance for convenience sake.
@@ -370,6 +388,7 @@ bool TileMap::checkCollision(SDL_Rect rect1)
 			return true;
 		}
 	}
+	*/
 
 	// Replacement for above code using the new vector tileRects[]
 	for (int i=0; i<possibleCollidingTiles.size(); i++)

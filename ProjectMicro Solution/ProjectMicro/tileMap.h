@@ -34,7 +34,7 @@ class TileMap
 		//the trait value for specified trait
 		int getTileTraitAt(int x, int y, int trait);
 		SDL_Rect getTileRectAt(int x, int y);
-		bool checkCollision(SDL_Rect);
+		bool checkCollision(SDL_Rect rect1);
 		void changeTileAt(int x, int y, int blockType);
 		std::vector<pathCoord> pathFind(double startX, double startY, double endX, double endY);
 		void saveMapFile();

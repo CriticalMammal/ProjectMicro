@@ -27,6 +27,8 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 {
 	x = xIn;
 	y = yIn;
+	oldX = x;
+	oldY = y;
 	width = wIn;
 	height = hIn;
 
@@ -72,12 +74,12 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 }
 
 
-void Player::initializeBoard(SDL_Renderer &renderer)
+void Player::initializeBoard(SDL_Renderer &renderer, std::string mapTxtFile)
 {
 	double blockWidth = (double)width/(double)boardWidth;
 	double blockHeight = (double)height/(double)boardHeight;
 
-	motherBoard.initialize("none", boardHeight, boardWidth, blockHeight, blockWidth, &renderer);
+	motherBoard.initialize(mapTxtFile, boardHeight, boardWidth, blockHeight, blockWidth, &renderer);
 	motherBoard.setX(x);
 	motherBoard.setY(y);
 }
@@ -87,6 +89,7 @@ void Player::update()
 {
 	updateCollisionRects();
 	updateMotherboard();
+	handleCollisions();
 }
 
 
@@ -174,16 +177,53 @@ void Player::updateCollisionRects()
 	collisionRect.w = width;
 	collisionRect.h = height;
 
-	collisionHorz.x = x;
-	collisionHorz.y = y+collisionPad;
-	collisionHorz.w = width;
-	collisionHorz.h = height-collisionPad*2;
+	collisionHorz.x = x*zoom - xOffset*zoom + SCREEN_WIDTH/2;
+	collisionHorz.y = y*zoom - yOffset*zoom + SCREEN_HEIGHT/2;
+	collisionHorz.w = width*zoom;
+	collisionHorz.h = (height*zoom);
+
+	//std::cout << "width: " << collisionHorz.w << ", height: " << collisionHorz.h << std::endl;
 
 	collisionVert.x = x+collisionPad;
 	collisionVert.y = y;
-	collisionVert.w = width-collisionPad*2;
+	collisionVert.w = (width)-collisionPad*2;
 	collisionVert.h = height;
 } // END updateCollisionRects()
+
+
+void Player::handleCollisions()
+{
+	//check for player collision with the tile map
+	if (chip != NULL)
+	{
+		if (motherBoard.checkCollision(chip->getPlayerRect()))
+		{
+			chip->setX(chip->getOldX());
+			chip->setY(chip->getOldY());
+			chip->setVx(0);
+			chip->setVy(0);
+			std::cout << "collision detected" << std::endl;
+		}
+
+		if (motherBoard.getTileTraitAt(chip->getPlayerRect().x, chip->getPlayerRect().y, 0) == 1)
+		{
+			std::cout << "corner collision detected" << std::endl;
+		}
+		//if (motherBoard.checkCollision(chip->getCollisionRectVert()))
+		//{
+		//	chip->setY(chip->getOldY());
+		//	chip->setVy(0);
+		//}
+
+
+		/*
+		std::cout << "Chip x: " << chip-> getCollisionRectHorz().x << std::endl
+				  << "Chip Y: " << chip-> getCollisionRectHorz().y << std::endl
+				  << "Chip W: " << chip-> getCollisionRectHorz().w << std::endl
+				  << "Chip H: " << chip-> getCollisionRectHorz().h << std::endl << std::endl;
+		*/
+	}
+}
 
 
 void Player::updateMotherboard()
