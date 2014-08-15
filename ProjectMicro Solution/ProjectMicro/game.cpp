@@ -85,7 +85,7 @@ int main(int argc, char *args[])
 	double shrinkRate = 12;
 	double shrinkSizeModifier = 8.4;
 
-	for (int i=0; i<=chipLayers; i++)
+	for (int i=0; i<chipLayers; i++)
 	{
 		if (i == 0)
 		{

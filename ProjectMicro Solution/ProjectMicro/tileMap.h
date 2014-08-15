@@ -21,7 +21,7 @@ class TileMap
 		int getTileElementAt(int x, int y);
 		std::vector<int> getTilesInRect(SDL_Rect rect1);
 		void updateTileRects();
-		
+		int getTileElementTrait(int element, int trait);
 
 	public:
 		TileMap();

@@ -151,17 +151,8 @@ void Player::handleKeys()
 	x += vx;
 	y += vy;
 
-	//update internal chip position (if it's here)
-	Player *chipReference;
-	chipReference = chip;
+	updateInternalChips();
 
-	while (chipReference != NULL)
-	{
-		chipReference->setX(chipReference->getX()+vx);
-		chipReference->setY(chipReference->getY()+vy);
-
-		chipReference = chipReference->chip;
-	}
 } //END handleKeys()
 
 
@@ -182,8 +173,6 @@ void Player::updateCollisionRects()
 	collisionHorz.w = width*zoom;
 	collisionHorz.h = (height*zoom);
 
-	//std::cout << "width: " << collisionHorz.w << ", height: " << collisionHorz.h << std::endl;
-
 	collisionVert.x = x+collisionPad;
 	collisionVert.y = y;
 	collisionVert.w = (width)-collisionPad*2;
@@ -196,32 +185,35 @@ void Player::handleCollisions()
 	//check for player collision with the tile map
 	if (chip != NULL)
 	{
+		
 		if (motherBoard.checkCollision(chip->getPlayerRect()))
 		{
 			chip->setX(chip->getOldX());
 			chip->setY(chip->getOldY());
 			chip->setVx(0);
 			chip->setVy(0);
-			std::cout << "collision detected" << std::endl;
-		}
-
-		if (motherBoard.getTileTraitAt(chip->getPlayerRect().x, chip->getPlayerRect().y, 0) == 1)
-		{
-			std::cout << "corner collision detected" << std::endl;
 		}
 		//if (motherBoard.checkCollision(chip->getCollisionRectVert()))
 		//{
 		//	chip->setY(chip->getOldY());
 		//	chip->setVy(0);
 		//}
+	}
+}
 
 
-		/*
-		std::cout << "Chip x: " << chip-> getCollisionRectHorz().x << std::endl
-				  << "Chip Y: " << chip-> getCollisionRectHorz().y << std::endl
-				  << "Chip W: " << chip-> getCollisionRectHorz().w << std::endl
-				  << "Chip H: " << chip-> getCollisionRectHorz().h << std::endl << std::endl;
-		*/
+void Player::updateInternalChips()
+{
+	//update internal chip position (if it's here)
+	Player *chipReference;
+	chipReference = chip;
+
+	while (chipReference != NULL)
+	{
+		chipReference->setX(chipReference->getX()+vx);
+		chipReference->setY(chipReference->getY()+vy);
+
+		chipReference = chipReference->chip;
 	}
 }
 

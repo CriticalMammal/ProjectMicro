@@ -22,6 +22,7 @@ class Player : public Sprite
 		void updateCollisionRects();
 		void handleCollisions();
 		void updateMotherboard();
+		void updateInternalChips();
 
 	public:
 		TileMap motherBoard;

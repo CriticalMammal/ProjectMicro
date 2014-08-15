@@ -249,27 +249,62 @@ void TileMap::saveMapFile()
 
 
 
-int TileMap::getTileElementAt(int x, int y)
+int TileMap::getTileElementAt(int xIn, int yIn)
 {
-	//If you divide the coordinates by the width/height of each tile...
-	//you should be able to find out the element it would be in the vector
-	double adjBlockW = blockW*zoom;
-	double adjBlockH = blockH*zoom;
+	double width = 1;
+	double height = 1;
 
-	int tilesWide = x/adjBlockW;
-	int tilesHigh = y/adjBlockH;
+	SDL_Rect rect1 = {xIn, yIn, width, height};
 
-	//each tilesHigh will be an entire row of tiles, aka the mapW
-	int tileElement = tilesHigh*mapW + tilesWide;
+	for (int i=0; i<tileMap.size()-1; i++)
+	{
+		if (collisionDetect(rect1, tileRects[i]))
+		{
+			return i;
+		}
+	}
 
-	return tileElement;
+	return 0;
+}
+
+// Very similar function to the function below
+int TileMap::getTileElementTrait(int element, int trait)
+{
+	if (element > 0 && element < tileMap.size())
+	{
+		//test what trait you should be returning
+		switch(trait)
+		{
+			case 0:
+				return blocks[tileMap[element]-1]->getCollision();
+				break;
+			case 1:
+				return blocks[tileMap[element]-1]->getTrait1();
+				break;
+			case 2:
+				return blocks[tileMap[element]-1]->getTrait2();
+				break;
+			case 3:
+				return blocks[tileMap[element]-1]->getTrait3();
+				break;
+			case 4:
+				return blocks[tileMap[element]-1]->getTrait4();
+				break;
+			default:
+				return -2;
+				break;
+		}
+	}
+	else
+		return -1;
 }
 
 
 
-int TileMap::getTileTraitAt(int x, int y, int trait)
+int TileMap::getTileTraitAt(int xIn, int yIn, int trait)
 {
-	int tileElement = getTileElementAt(x, y);
+	int tileElement = getTileElementAt(xIn, yIn);
+	//cout << ": tileElement " << tileElement << ": ";
 
 	if (tileElement > 0 && tileElement < tileMap.size())
 	{
@@ -302,53 +337,16 @@ int TileMap::getTileTraitAt(int x, int y, int trait)
 
 
 
-// This doesn't seem to return the tiles you expect it to
-// Expects rect1 to have proper perspective (zoom) applied
 vector<int> TileMap::getTilesInRect(SDL_Rect rect1)
 {
-	/*
-	cout << "map x: " << x << endl
-		 << "map y: " << y << endl;
-		 */
-
-	float adjBlockW = blockW*zoom;
-	float adjBlockH = blockH*zoom;
-
-	double tilesWide = rect1.x/adjBlockW;
-	double tilesHigh = rect1.y/adjBlockH;
-
-	int elementWidth = (rect1.x+rect1.w)/adjBlockW;
-	int elementHeight = (rect1.y+rect1.h)/adjBlockH;
-
-	int startingElement = tilesHigh*mapW + tilesWide;
-	int rowLength = elementWidth-1;
-	int endElement = (elementHeight)*mapW + (elementWidth-1);
-
-
-	if (startingElement < 0)
-	{
-		startingElement = 0;
-	}
-	if (endElement >= tileMap.size())
-	{
-		endElement = tileMap.size()-1;
-	}
-	if (rowLength >= mapW)
-	{
-		rowLength = mapW;
-	}
-
-
 	vector<int> collidingElements;
 
-	for (int i=startingElement; i<endElement; i+=mapW)
+	for (int i=0; i<tileMap.size()-1; i++)
 	{
-		for (int w = i; w<rowLength; w++) 
+		if (collisionDetect(rect1, tileRects[i]))
 		{
-			collidingElements.push_back(w);
+			collidingElements.push_back(i);
 		}
-
-		rowLength += mapW;
 	}
 
 	return collidingElements;
@@ -360,45 +358,26 @@ bool TileMap::checkCollision(SDL_Rect rect1)
 {
 	vector<int> possibleCollidingTiles = getTilesInRect(rect1);
 	
-	/*
-	for (int c=0; c<possibleCollidingTiles.size(); c++)
-	{
-		std::cout << possibleCollidingTiles[c] << ", ";
-	}
-	std::cout << std::endl;
-	*/
-
 	
-	/*
-	//weird approach, you needed to find the x,y of an element in the tile array to
-	//get the collision rect. But it should be easier than this. The x/y etc. should
-	//probably be stored in each tile instance for convenience sake.
 	for (int c=0; c<possibleCollidingTiles.size(); c++)
 	{
-		int tileElement = possibleCollidingTiles[c];
-		int tileX = (tileElement%mapW) * blockW;
-		int tileY = tileElement/mapW * blockH;
-		int tileW = tileX + blockW;
-		int tileH = tileY + blockH;
-		SDL_Rect tileRect = {tileX, tileY, tileW, tileH};
-
-		if (getTileTraitAt(tileX, tileY, 0) == 1 &&
-			collisionDetect(rect1, tileRect))
-		{
-			return true;
-		}
+		//std::cout << possibleCollidingTiles[c] << ", ";
 	}
-	*/
+	//std::cout << std::endl;
 
-	// Replacement for above code using the new vector tileRects[]
+
+
 	for (int i=0; i<possibleCollidingTiles.size(); i++)
 	{
-		if (getTileTraitAt(tileRects[i].x, tileRects[i].y, 0) == 1 &&
-			collisionDetect(rect1, tileRects[i]))
+		if (getTileElementTrait(possibleCollidingTiles[i], 0) == 1)
 		{
 			return true;
 		}
+
+		//cout << getTileElementTrait(possibleCollidingTiles[i], 0) << ", "; 
 	}
+
+	//cout << endl << endl;
 
 	return false;
 }
