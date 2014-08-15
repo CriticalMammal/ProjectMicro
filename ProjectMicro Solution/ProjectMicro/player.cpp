@@ -32,6 +32,8 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	width = wIn;
 	height = hIn;
 
+	colliding = false;
+
 	playerRect.x = (x*zoom-xOffset);
 	playerRect.y = (y*zoom-yOffset);
 	playerRect.w = width*zoom;
@@ -90,6 +92,7 @@ void Player::update()
 	updateCollisionRects();
 	updateMotherboard();
 	handleCollisions();
+	updateInternalChips();
 }
 
 
@@ -151,7 +154,7 @@ void Player::handleKeys()
 	x += vx;
 	y += vy;
 
-	updateInternalChips();
+	//updateInternalChips();
 
 } //END handleKeys()
 
@@ -182,9 +185,26 @@ void Player::updateCollisionRects()
 
 void Player::handleCollisions()
 {
-	//check for player collision with the tile map
-	if (chip != NULL)
+	if (chip != NULL && parentChip != NULL)
 	{
+		colliding = false;
+
+		if (parentChip->motherBoard.checkCollision(playerRect))
+		{
+			setX(oldX);
+			setY(oldY);
+			setVx(0);
+			setVy(0);
+
+			colliding = true;
+		}
+	}
+
+	/*
+	//check for player collision with the tile map
+	if (chip != NULL && parentChip != NULL)
+	{
+		chip->setColliding(false);
 		
 		if (motherBoard.checkCollision(chip->getPlayerRect()))
 		{
@@ -192,28 +212,21 @@ void Player::handleCollisions()
 			chip->setY(chip->getOldY());
 			chip->setVx(0);
 			chip->setVy(0);
+
+			chip->setColliding(true);
 		}
-		//if (motherBoard.checkCollision(chip->getCollisionRectVert()))
-		//{
-		//	chip->setY(chip->getOldY());
-		//	chip->setVy(0);
-		//}
 	}
+	*/
 }
 
 
 void Player::updateInternalChips()
 {
 	//update internal chip position (if it's here)
-	Player *chipReference;
-	chipReference = chip;
-
-	while (chipReference != NULL)
+	if (chip != NULL && getColliding() == false)
 	{
-		chipReference->setX(chipReference->getX()+vx);
-		chipReference->setY(chipReference->getY()+vy);
-
-		chipReference = chipReference->chip;
+		chip->setX(chip->getX()+vx);
+		chip->setY(chip->getY()+vy);
 	}
 }
 

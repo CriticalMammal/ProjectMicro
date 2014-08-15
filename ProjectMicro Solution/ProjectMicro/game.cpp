@@ -101,6 +101,7 @@ int main(int argc, char *args[])
 			newSpeed = chips.back()->getSpeed()/shrinkRate;
 			chips.back()->chip = new Player;
 			chips.push_back(chips.back()->chip);
+			chips.back()->setParentChip(chips[chips.size()-2]);
 		}
 
 		chips.back()->initializeChip(oldX+(oldW/shrinkRate), 
