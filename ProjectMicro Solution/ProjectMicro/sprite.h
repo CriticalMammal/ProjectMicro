@@ -38,6 +38,8 @@ class Sprite
 
 		void setX(double newX) {x = newX;}
 		void setY(double newY) {y = newY;}
+		void setOldX(double newX) {oldX = newX;}
+		void setOldY(double newY) {oldY = newY;}
 		void setVx(double newVx){vx = newVx;}
 		void setVy(double newVy){vy = newVy;}
 		void setWidth(double newW){width = newW;}
