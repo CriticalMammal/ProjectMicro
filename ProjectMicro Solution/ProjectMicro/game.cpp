@@ -22,8 +22,6 @@
 using namespace std;
 
 
-
-
 // Variable Definitions
 SDL_Event evt;
 SDL_Window *window = NULL;
@@ -37,7 +35,6 @@ bool keys[] = {false, false, false, false, false, false}; // Array to track key 
 // Function Definitions 
 bool init();
 void close();	// Destroys allocated memory and closes the game
-
 
 
 
@@ -60,7 +57,6 @@ int main(int argc, char *args[])
 	// Load Audio
 	Mix_Chunk *bgMusic = NULL;
 	Mix_Chunk *whooshSound = NULL;
-
 	bgMusic = Mix_LoadWAV("audio/corsica_crussles.wav");
 	whooshSound = Mix_LoadWAV("audio/bigWhoosh (amplified).wav");
 
@@ -72,14 +68,14 @@ int main(int argc, char *args[])
 	channel = Mix_FadeInChannel(-1, bgMusic, -1, 3000);
 
 	// Temp player chip implementation
-	int controlledChip = 0;
+	int controlledChip = 0;	// Initially set control to first chip
 	double chipStartX = 400*zoom, chipStartY = 800*zoom, 
 		chipStartW = 100, chipStartH = 100;
-	double oldX, oldY, oldW, oldH, newW, newH, newSpeed;
-	oldX = chipStartX*20;
-	oldY = chipStartY*20;
-	oldW = chipStartW;
-	oldH = chipStartH;	
+	double newW, newH, newSpeed, 
+		oldX = chipStartX*20,
+		oldY = chipStartY*20,
+		oldW = chipStartW,
+		oldH = chipStartH;
 
 	double shrinkRate = 12;
 
@@ -174,6 +170,12 @@ int main(int argc, char *args[])
 						break;
 					case SDLK_RIGHTBRACKET:
 						camera.newZoom(zoom+(zoom/2));
+						//cout << zoom + (zoom/2) << endl;
+						break;
+					case SDLK_c:
+						// Slow player speed
+						
+						break;
 				}
 			}
 			else if (evt.type == SDL_KEYUP)		// Key Up events
@@ -198,6 +200,10 @@ int main(int argc, char *args[])
 					case SDLK_d:
 					case SDLK_RIGHT:
 						keys[RIGHT] = false;
+						break;
+					case SDLK_c:
+						// Reset player speed to normal
+
 						break;
 				}
 			}

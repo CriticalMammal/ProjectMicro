@@ -72,7 +72,6 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	
 	boardWidth = 20;
 	boardHeight = boardWidth;
-	boardCapacity = boardWidth*boardHeight;
 	boardX = x;
 	boardY = y;
 }
