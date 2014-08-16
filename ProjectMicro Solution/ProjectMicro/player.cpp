@@ -25,8 +25,22 @@ Player::~Player()
 
 void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, double newSpeed)
 {
-	x = xIn;
-	y = yIn;
+	baseX = xIn;
+	baseY = yIn;
+	oldBaseX = baseX;
+	oldBaseY = baseY;
+	
+	if (parentChip != NULL)
+	{
+		x = baseX + parentChip->getX();
+		y = baseY + parentChip->getY();
+	}
+	else
+	{
+		x = baseX;
+		y = baseY;
+	}
+
 	oldX = x;
 	oldY = y;
 	width = wIn;
@@ -59,8 +73,8 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	vx = 0;
 	vy = 0;
 	friction = 0.8;
-	speed = newSpeed;;
-	maxSpeed = 1;
+	speed = newSpeed;
+	maxSpeed = speed*20;
 	oldMaxSpeed = maxSpeed;
 
 	randomColor.r = randomNumber(0, 255);
@@ -151,8 +165,21 @@ void Player::handleKeys()
 	//update position
 	oldX = x;
 	oldY = y;
-	x += vx;
-	y += vy;
+	oldBaseX = baseX;
+	oldBaseY = baseY;
+	baseX += vx;
+	baseY += vy;
+
+	if (parentChip != NULL)
+	{
+		x = baseX + parentChip->getX();
+		y = baseY + parentChip->getY();
+	}
+	else
+	{
+		x = baseX;
+		y = baseY;
+	}
 
 } //END handleKeys()
 
@@ -182,31 +209,16 @@ void Player::updateCollisionRects()
 
 
 void Player::handleCollisions()
-{
-	/*
-	if (parentChip != NULL)
-	{
-		colliding = false;
-
-		if (parentChip->motherBoard.checkCollision(playerRect))
-		{
-			x = oldX;
-			y = oldY;
-			vx = 0;
-			vy = 0;
-
-			colliding = true;
-		}
-	}
-	*/
-	
-	//check for player collision with the tile map
+{	
+	// Check for player collision with the tile map
 	if (chip != NULL)
 	{
 		chip->setColliding(false);
 		
 		if (motherBoard.checkCollision(chip->getPlayerRect()))
 		{
+			chip->setBaseX(chip->getOldBaseX());
+			chip->setBaseY(chip->getOldBaseY());
 			chip->setX(chip->getOldX());
 			chip->setY(chip->getOldY());
 			chip->setVx(0);
@@ -221,25 +233,14 @@ void Player::handleCollisions()
 
 void Player::updateInternalChips()
 {
-	//update internal chip position (if it's here)
-	
-	if (chip != NULL && colliding == false)
+	// Update internal chip position (if it's here)
+	if (chip != NULL)
 	{
 		chip->setOldX(chip->getX());
 		chip->setOldY(chip->getY());
-
-		chip->setX(chip->getX() + (x - oldX));
-		chip->setY(chip->getY() + (y - oldY));
+		chip->setX(chip->getBaseX() + x);
+		chip->setY(chip->getBaseY() + y);
 	}
-	
-
-	/*
-	if (parentChip != NULL)
-	{
-		x = x + (parentChip->getX() - parentChip->getOldX());
-		y = y + (parentChip->getY() - parentChip->getOldY());
-	}
-	*/
 }
 
 

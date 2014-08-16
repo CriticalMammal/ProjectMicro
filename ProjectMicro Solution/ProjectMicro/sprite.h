@@ -10,8 +10,7 @@ class Sprite
 {
 	protected:
 		double x, y, midX, midY, oldX, oldY, vx, vy,
-			  speed, friction, maxSpeed,
-			  oldMaxSpeed;
+			  speed, friction, maxSpeed, oldMaxSpeed;
 		double width, height, orgWidth, orgHeight;
 		SDL_Rect collisionRect;
 		SDL_Rect collisionVert;
@@ -28,6 +27,7 @@ class Sprite
 		double getMidX() {return x + 0.5f*width;}
 		double getMidY() {return y + 0.5f*height;}
 		double getSpeed() {return speed;}
+		double getMaxSpeed() {return maxSpeed;}
 		double getWidth() {return width;}
 		double getHeight() {return height;}
 		double getvx() {return vx;}
@@ -44,6 +44,7 @@ class Sprite
 		void setVy(double newVy){vy = newVy;}
 		void setWidth(double newW){width = newW;}
 		void setHeight(double newH){height = newH;}
+		void setMaxSpeed (double newMax) {maxSpeed = newMax;}
 
 		void updatePos();
 		double randomNumber(double, double);

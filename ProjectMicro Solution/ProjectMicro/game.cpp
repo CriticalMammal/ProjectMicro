@@ -74,11 +74,11 @@ int main(int argc, char *args[])
 
 	// Temp player chip implementation
 	int controlledChip = 0;
-	double chipStartX = 60*zoom, chipStartY = 60*zoom, 
+	double chipStartX = 400*zoom, chipStartY = 800*zoom, 
 		chipStartW = 100, chipStartH = 100;
 	double oldX, oldY, oldW, oldH, newW, newH, newSpeed;
-	oldX = chipStartX;
-	oldY = chipStartY;
+	oldX = chipStartX*20;
+	oldY = chipStartY*20;
 	oldW = chipStartW;
 	oldH = chipStartH;	
 
@@ -91,7 +91,7 @@ int main(int argc, char *args[])
 		{
 			newW = oldW;
 			newH = oldH;
-			newSpeed = 0.1;
+			newSpeed = 0.05;
 			chips.push_back(new Player);
 		}
 		else
@@ -103,12 +103,11 @@ int main(int argc, char *args[])
 			chips.push_back(chips.back()->chip);
 			chips.back()->setParentChip(chips[chips.size()-2]);
 		}
-
-		chips.back()->initializeChip(oldX+(oldW/shrinkRate), 
-			oldY+(oldH/shrinkRate), newW, newH, newSpeed);
+		
+		chips.back()->initializeChip(oldX/20, oldY/20, newW, newH, newSpeed);
 		chips.back()->initializeBoard(*renderer, "mapFile.txt");
-		oldX = oldX+(oldW/shrinkRate);
-		oldY = oldY+(oldH/shrinkRate);
+		oldX /= 20;
+		oldY /= 20;
 		oldW = newW;
 		oldH = newH;
 	}
@@ -124,7 +123,7 @@ int main(int argc, char *args[])
 
 	Camera camera;
 	camera.setfollowedObject(chips[controlledChip]);
-	zoom = 1;
+	zoom = 0.01;
 	camera.newZoom(zoom);
 
 	// Create a temporary tile map test
