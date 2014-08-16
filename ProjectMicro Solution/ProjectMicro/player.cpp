@@ -228,8 +228,6 @@ void Player::updateInternalChips()
 		chip->setOldX(chip->getX());
 		chip->setOldY(chip->getY());
 
-		//chip->setX(chip->getX()+vx);
-		//chip->setY(chip->getY()+vy);
 		chip->setX(chip->getX() + (x - oldX));
 		chip->setY(chip->getY() + (y - oldY));
 	}

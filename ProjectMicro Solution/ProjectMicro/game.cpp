@@ -63,7 +63,7 @@ int main(int argc, char *args[])
 	Mix_Chunk *whooshSound = NULL;
 
 	bgMusic = Mix_LoadWAV("audio/corsica_crussles.wav");
-	whooshSound = Mix_LoadWAV("audio/bigWhoosh.wav");
+	whooshSound = Mix_LoadWAV("audio/bigWhoosh (amplified).wav");
 
 	if (bgMusic == NULL || whooshSound == NULL)
 	{
