@@ -46,8 +46,6 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	width = wIn;
 	height = hIn;
 
-	colliding = false;
-
 	playerRect.x = (x*zoom-xOffset);
 	playerRect.y = (y*zoom-yOffset);
 	playerRect.w = width*zoom;
@@ -59,16 +57,6 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	collisionRect.h = height;
 
 	collisionPad = 1;
-
-	collisionHorz.x = x;
-	collisionHorz.y = y+collisionPad;
-	collisionHorz.w = width;
-	collisionHorz.h = height-collisionPad*2;
-
-	collisionVert.x = x+collisionPad;
-	collisionVert.y = y;
-	collisionVert.w = width-collisionPad*2;
-	collisionVert.h = height;
 
 	vx = 0;
 	vy = 0;
@@ -195,16 +183,6 @@ void Player::updateCollisionRects()
 	collisionRect.y = y;
 	collisionRect.w = width;
 	collisionRect.h = height;
-
-	collisionHorz.x = x*zoom - xOffset*zoom + SCREEN_WIDTH/2;
-	collisionHorz.y = y*zoom - yOffset*zoom + SCREEN_HEIGHT/2;
-	collisionHorz.w = width*zoom;
-	collisionHorz.h = (height*zoom);
-
-	collisionVert.x = x+collisionPad;
-	collisionVert.y = y;
-	collisionVert.w = (width)-collisionPad*2;
-	collisionVert.h = height;
 } // END updateCollisionRects()
 
 
@@ -213,8 +191,6 @@ void Player::handleCollisions()
 	// Check for player collision with the tile map
 	if (chip != NULL)
 	{
-		chip->setColliding(false);
-		
 		if (motherBoard.checkCollision(chip->getPlayerRect()))
 		{
 			chip->setBaseX(chip->getOldBaseX());
@@ -223,8 +199,6 @@ void Player::handleCollisions()
 			chip->setY(chip->getOldY());
 			chip->setVx(0);
 			chip->setVy(0);
-
-			chip->setColliding(true);
 		}
 	}
 	
@@ -262,8 +236,8 @@ void Player::updateMotherboard()
 void Player::draw(SDL_Renderer *renderer)
 {
 	// Draw Chip Background
-	SDL_SetRenderDrawColor(renderer, randomColor.r, randomColor.g, randomColor.b, 255);
-	SDL_RenderFillRect(renderer, &playerRect);
+	//SDL_SetRenderDrawColor(renderer, randomColor.r, randomColor.g, randomColor.b, 255);
+	//SDL_RenderFillRect(renderer, &playerRect);
 
 	// Draw Motherboard
 	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};

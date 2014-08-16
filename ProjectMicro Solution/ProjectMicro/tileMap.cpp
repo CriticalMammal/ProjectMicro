@@ -195,12 +195,17 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 	updateTileRects(); // Temporary, shouldn't call this from draw()
 
 	vector<int> tilesToDraw;
-	//tilesToDraw = getTilesInRect(screenRect);
+	tilesToDraw = getTilesInRect(screenRect);
 
+	
+	// Draw tile Rect grid for example
+	/*
 	for (int i=0; i<tileMap.size()-1; i++)
 	{
-		tilesToDraw.push_back(i);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		SDL_RenderDrawRect(renderer, &tileRects[i]);
 	}
+	*/
 
 	if (tilesToDraw.size() <= 0)
 	{
@@ -208,23 +213,23 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 	}
 
 	// Draw elements
-	for (int i=tilesToDraw.front(); i<tilesToDraw.size(); i++)
+	for (int i=0; i<tilesToDraw.size(); i++)
 	{
-			if (tileMap[i] == 1)
+			if (tileMap[tilesToDraw[i]] == 1)
 			{
-				SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &tileRects[i]);
+				SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
 			}
-			else if (tileMap[i] == 2)
+			else if (tileMap[tilesToDraw[i]] == 2)
 			{
-				SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &tileRects[i]);
+				SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
 			}
-			else if (tileMap[i] == 3)
+			else if (tileMap[tilesToDraw[i]] == 3)
 			{
-				SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &tileRects[i]);
+				SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
 			}
 			else
 			{
-				SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &tileRects[i]);
+				SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
 			}
 	}
 
@@ -357,14 +362,6 @@ vector<int> TileMap::getTilesInRect(SDL_Rect rect1)
 bool TileMap::checkCollision(SDL_Rect rect1)
 {
 	vector<int> possibleCollidingTiles = getTilesInRect(rect1);
-	
-	
-	for (int c=0; c<possibleCollidingTiles.size(); c++)
-	{
-		//std::cout << possibleCollidingTiles[c] << ", ";
-	}
-	//std::cout << std::endl;
-
 
 
 	for (int i=0; i<possibleCollidingTiles.size(); i++)
@@ -373,11 +370,7 @@ bool TileMap::checkCollision(SDL_Rect rect1)
 		{
 			return true;
 		}
-
-		//cout << getTileElementTrait(possibleCollidingTiles[i], 0) << ", "; 
 	}
-
-	//cout << endl << endl;
 
 	return false;
 }

@@ -15,15 +15,6 @@ Sprite::Sprite() {}
 
 Sprite::~Sprite() {}
 
-void Sprite::updatePos()
-{
-	oldX = x;
-	oldY = y;
-
-	x += vx;
-	y += vy;
-}
-
 //come up with a better solution to distribute the random
 //numbers evenly. rand() doesn't evenly distribute!
 double Sprite::randomNumber(double Min, double Max)

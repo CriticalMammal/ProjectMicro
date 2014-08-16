@@ -41,7 +41,6 @@ void close();	// Destroys allocated memory and closes the game
 
 
 
-
 int main(int argc, char *args[])
 {
 	srand((unsigned)time(NULL)); //seed random numbers
@@ -55,7 +54,7 @@ int main(int argc, char *args[])
 
 	// Initialize Variables
 	bool quit = false;		// Track when to quit the game
-	int chipLayers = 5;		// How many chips there will be
+	int chipLayers = 15;		// How many chips there will be
 	vector<Player*> chips;	// Vector to contain player chips
 
 	// Load Audio
@@ -83,7 +82,6 @@ int main(int argc, char *args[])
 	oldH = chipStartH;	
 
 	double shrinkRate = 12;
-	double shrinkSizeModifier = 8.4;
 
 	for (int i=0; i<chipLayers; i++)
 	{
@@ -91,7 +89,7 @@ int main(int argc, char *args[])
 		{
 			newW = oldW;
 			newH = oldH;
-			newSpeed = 0.05;
+			newSpeed = 0.2;
 			chips.push_back(new Player);
 		}
 		else
@@ -173,11 +171,9 @@ int main(int argc, char *args[])
 						break;
 					case SDLK_LEFTBRACKET:
 						camera.newZoom(zoom-(zoom/2));
-						cout << "zoom = " << zoom-(zoom/2) << endl;
 						break;
 					case SDLK_RIGHTBRACKET:
 						camera.newZoom(zoom+(zoom/2));
-						cout << "zoom = " << zoom+(zoom/2) << endl;
 				}
 			}
 			else if (evt.type == SDL_KEYUP)		// Key Up events

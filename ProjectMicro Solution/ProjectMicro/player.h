@@ -7,7 +7,6 @@
 class Player : public Sprite
 {
 	private:
-		double baseX, baseY, oldBaseX, oldBaseY; // Local xy values
 		int collisionPad;
 		SDL_Rect playerRect; //used to draw the player square
 		SDL_Texture* tempTexture;
@@ -18,7 +17,6 @@ class Player : public Sprite
 		int boardCapacity;
 		int boardWidth, boardHeight;
 		double boardX, boardY;
-		bool colliding;
 
 		std::vector<SDL_Rect> boardGrid;
 
@@ -44,19 +42,9 @@ class Player : public Sprite
 		SDL_Rect getPlayerRect() {return playerRect;}
 		double getBlockW();
 		double getBlockH();
-		double getBaseX() {return baseX;}
-		double getBaseY() {return baseY;}
-		double getOldBaseX() {return oldBaseX;}
-		double getOldBaseY() {return oldBaseY;}
-		bool getColliding() {return colliding;}
 		Player* getParentChip() {return parentChip;}
 
-		void setBaseX(double baseXIn) {baseX = baseXIn;}
-		void setBaseY(double baseYIn) {baseY = baseYIn;}
-		void setOldBaseX(double baseXIn) {oldBaseX = baseXIn;}
-		void setOldBaseY(double baseYIn) {oldBaseY = baseYIn;}
 		void setParentChip(Player *newParent) {parentChip = newParent;}
-		void setColliding(bool newBool) {colliding = newBool;}
 };
 
 #endif
