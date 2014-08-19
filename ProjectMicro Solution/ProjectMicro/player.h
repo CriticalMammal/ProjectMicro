@@ -10,13 +10,13 @@ class Player : public Sprite
 		int collisionPad;
 		SDL_Rect playerRect; //used to draw the player square
 		SDL_Texture* tempTexture;
-		SDL_Color randomColor;
 		Player *parentChip;
 
 		//motherboard variables (tileMap inside this chip)
 		int boardCapacity;
 		int boardWidth, boardHeight;
 		double boardX, boardY;
+		bool chipPowered;
 
 		std::vector<SDL_Rect> boardGrid;
 
@@ -43,8 +43,10 @@ class Player : public Sprite
 		double getBlockW();
 		double getBlockH();
 		Player* getParentChip() {return parentChip;}
+		bool getChipPowerState() {return chipPowered;}
 
 		void setParentChip(Player *newParent) {parentChip = newParent;}
+		void setChipPoweredState(bool newState) {chipPowered = newState;}
 };
 
 #endif

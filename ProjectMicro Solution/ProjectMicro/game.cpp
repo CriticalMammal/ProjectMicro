@@ -240,7 +240,7 @@ int main(int argc, char *args[])
 
 		for (int i=0; i<chipLayers; i++)
 		{
-			if (i == controlledChip)
+			if (i == controlledChip && chips[i]->getChipPowerState() == true)
 			{
 				chips[i]->handleKeys();
 			}

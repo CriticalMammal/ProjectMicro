@@ -25,6 +25,15 @@ Player::~Player()
 
 void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, double newSpeed)
 {
+	int randomPowerState = randomNumber(0, 2);
+	if (randomPowerState == 0)
+	{
+		chipPowered = false;
+	}
+	else
+	{
+		chipPowered = true;
+	}
 	baseX = xIn;
 	baseY = yIn;
 	oldBaseX = baseX;
@@ -51,11 +60,6 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	playerRect.w = width*zoom;
 	playerRect.h = height*zoom;
 
-	collisionRect.x = x;
-	collisionRect.y = y;
-	collisionRect.w = width;
-	collisionRect.h = height;
-
 	collisionPad = 1;
 
 	vx = 0;
@@ -64,16 +68,16 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	speed = newSpeed;
 	maxSpeed = speed*20;
 	oldMaxSpeed = maxSpeed;
-
-	randomColor.r = randomNumber(0, 255);
-	randomColor.g = randomNumber(0, 255);
-	randomColor.b = randomNumber(0, 255);
-	randomColor.a = 255;
 	
 	boardWidth = 20;
 	boardHeight = boardWidth;
 	boardX = x;
 	boardY = y;
+
+	collisionRect.x = x*zoom - xOffset*zoom + SCREEN_WIDTH/2;
+	collisionRect.y = y*zoom - yOffset*zoom + SCREEN_HEIGHT/2;
+	collisionRect.w = (width)*zoom;
+	collisionRect.h = (height)*zoom;
 }
 
 
@@ -178,10 +182,10 @@ void Player::updateCollisionRects()
 	playerRect.w = width*zoom;
 	playerRect.h = height*zoom;
 
-	collisionRect.x = x;
-	collisionRect.y = y;
-	collisionRect.w = width;
-	collisionRect.h = height;
+	collisionRect.x = x*zoom - xOffset*zoom + SCREEN_WIDTH/2;
+	collisionRect.y = y*zoom - yOffset*zoom + SCREEN_HEIGHT/2;
+	collisionRect.w = (width)*zoom;
+	collisionRect.h = (height)*zoom;
 } // END updateCollisionRects()
 
 
@@ -243,6 +247,12 @@ void Player::draw(SDL_Renderer *renderer)
 	if (width*zoom > 2)
 	{
 		motherBoard.drawTileMap(screenRect, renderer);
+	}
+
+	if (!chipPowered)
+	{
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 100);
+		SDL_RenderFillRect(renderer, &collisionRect);
 	}
 } // END draw()
 
