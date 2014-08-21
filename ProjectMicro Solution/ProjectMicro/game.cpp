@@ -6,6 +6,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
+#include <SDL_image.h>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -41,7 +42,7 @@ void close();	// Destroys allocated memory and closes the game
 int main(int argc, char *args[])
 {
 	srand((unsigned)time(NULL)); //seed random numbers
-
+	
 	// Initialize SDL
 	if (!init())
 	{
@@ -90,18 +91,18 @@ int main(int argc, char *args[])
 		}
 		else
 		{
-			newW = chips.back()->getBlockW();
-			newH = chips.back()->getBlockH();
+			newW = chips.back()->getBlockW()*0.75;
+			newH = chips.back()->getBlockH()*0.75;
 			newSpeed = chips.back()->getSpeed()/shrinkRate;
 			chips.back()->chip = new Player;
 			chips.push_back(chips.back()->chip);
 			chips.back()->setParentChip(chips[chips.size()-2]);
 		}
 		
-		chips.back()->initializeChip(oldX/20, oldY/20, newW, newH, newSpeed);
+		oldX = oldX/30;
+		oldY = oldY/30;
+		chips.back()->initializeChip(oldX, oldY, newW, newH, newSpeed);
 		chips.back()->initializeBoard(*renderer, "mapFile.txt");
-		oldX /= 20;
-		oldY /= 20;
 		oldW = newW;
 		oldH = newH;
 	}
@@ -117,7 +118,7 @@ int main(int argc, char *args[])
 
 	Camera camera;
 	camera.setfollowedObject(chips[controlledChip]);
-	zoom = 0.01;
+	zoom = 1;
 	camera.newZoom(zoom);
 
 	// Create a temporary tile map test
@@ -170,7 +171,7 @@ int main(int argc, char *args[])
 						break;
 					case SDLK_RIGHTBRACKET:
 						camera.newZoom(zoom+(zoom/2));
-						//cout << zoom + (zoom/2) << endl;
+						cout << zoom + (zoom/2) << endl;
 						break;
 					case SDLK_c:
 						// Slow player speed
@@ -288,7 +289,7 @@ int main(int argc, char *args[])
 bool init()
 {
 	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		printf("SDL Init failed. SDL_Error: %s\n", SDL_GetError());
 		return false;
@@ -326,6 +327,14 @@ bool init()
 		cout << "Timer failed to init. SDL_ERROR: " << SDL_GetError() << endl;
 		return false;
 	}
+
+	// Init SDL_Image
+    int flags = IMG_INIT_JPG | IMG_INIT_PNG;
+    int initted=IMG_Init(flags);
+    if( initted & flags != flags) {
+        cout<<"could not init SDL_Image" << endl;
+        cout<<"Reason: " << IMG_GetError() << endl;
+    }
 
 	// Init Audio Mixer
 	int audio_rate = 22050;

@@ -23,6 +23,8 @@ class TileMap
 		void updateTileRects();
 		int getTileElementTrait(int element, int trait);
 
+		void fill_circle(SDL_Surface *surface, int cx, int cy, int radius, Uint32 pixel);
+
 	public:
 		TileMap();
 		~TileMap();

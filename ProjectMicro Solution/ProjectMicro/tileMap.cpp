@@ -1,6 +1,7 @@
 //tileMap.cpp - source file for the game's tile map. 
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <fstream> //is a part of <stdio>?
 #include <iostream>
 #include <string>
@@ -85,12 +86,14 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 
 		realX = orgRealX;
 		realY += blockHeight;
+		i--;
 	}
 
 
 	//"tileSheet.bmp" should be a parameter in the init function
 	//to make this class more versatile
-	tileSheet = SDL_LoadBMP("tileSheet.bmp");
+	//tileSheet = SDL_LoadBMP("tileSheetCircles.bmp");
+	tileSheet = IMG_Load("tileSheetCorners.png");
 
 	//load traits from txt file.
 	//"tileTraits.txt" should be a parameter in the init function
@@ -111,15 +114,19 @@ void TileMap::initialize(std::string fileLocation, int mapHeight, int mapWidth, 
 			//it to properly blit the tilesheet into parts? otherwise using
 			//SDL_CreateRGBSurface() causes it to fill everything by the color of
 			//the first pixel
-			SDL_Surface *tempSurface = SDL_LoadBMP("tempTile.bmp");
+			//SDL_Surface *tempSurface = SDL_LoadBMP("tempTile.bmp");
+			SDL_Surface *tempSurface = IMG_Load("tempTile.png");
 			blockSurface.push_back(tempSurface);
 
 			SDL_Rect clip = {w, h, importWidth, importHeight};
 
-			if (SDL_BlitSurface(tileSheet, &clip, blockSurface.back(), NULL) != 0)
+			
+			if (SDL_BlitSurface(tileSheet, &clip, blockSurface.back(), NULL) == -1)
 			{
 				cout << "Error, SDL_Blit failed: " << SDL_GetError() << endl;
 			}
+
+			
 		}
 	}
 
@@ -215,22 +222,24 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 	// Draw elements
 	for (int i=0; i<tilesToDraw.size(); i++)
 	{
-			if (tileMap[tilesToDraw[i]] == 1)
-			{
-				SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
-			}
-			else if (tileMap[tilesToDraw[i]] == 2)
-			{
-				SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
-			}
-			else if (tileMap[tilesToDraw[i]] == 3)
-			{
-				SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
-			}
-			else
-			{
-				SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
-			}
+		
+		if (tileMap[tilesToDraw[i]] == 1)
+		{
+			SDL_RenderCopy(renderer, blocks[0]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
+		}
+		else if (tileMap[tilesToDraw[i]] == 2)
+		{
+			SDL_RenderCopy(renderer, blocks[1]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
+		}
+		else if (tileMap[tilesToDraw[i]] == 3)
+		{
+			SDL_RenderCopy(renderer, blocks[2]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
+		}
+		else
+		{
+			SDL_RenderCopy(renderer, blocks[3]->gettileTexture(), NULL, &tileRects[tilesToDraw[i]]);
+		}
+		
 	}
 
 } // END draw()
@@ -346,7 +355,7 @@ vector<int> TileMap::getTilesInRect(SDL_Rect rect1)
 {
 	vector<int> collidingElements;
 
-	for (int i=0; i<tileMap.size()-1; i++)
+	for (int i=0; i<tileMap.size(); i++)
 	{
 		if (collisionDetect(rect1, tileRects[i]))
 		{
@@ -711,4 +720,43 @@ SDL_Texture* TileMap::loadTexture (std::string path, SDL_Surface *currentSurface
 float TileMap::randomNumber(float Min, float Max)
 {
     return ((float(rand()) / float(RAND_MAX)) * (Max - Min)) + Min;
+}
+
+
+void TileMap::fill_circle(SDL_Surface *surface, int cx, int cy, int radius, Uint32 pixel)
+{
+    // Note that there is more to altering the bitrate of this 
+    // method than just changing this value.  See how pixels are
+    // altered at the following web page for tips:
+    // http://www.libsdl.org/intro.en/usingvideo.html
+
+    static const int BPP = 4;
+ 
+    double r = (double)radius;
+ 
+    for (double dy = 1; dy <= r; dy += 1.0)
+    {
+        // This loop is unrolled a bit, only iterating through half of the
+        // height of the circle.  The result is used to draw a scan line and
+        // its mirror image below it.
+ 
+        // The following formula has been simplified from our original.  We
+        // are using half of the width of the circle because we are provided
+        // with a center and we need left/right coordinates.
+ 
+        double dx = floor(sqrt((2.0 * r * dy) - (dy * dy)));
+        int x = cx - dx;
+ 
+        // Grab a pointer to the left-most pixel for each half of the circle
+        Uint8 *target_pixel_a = (Uint8 *)surface->pixels + ((int)(cy + r - dy)) * surface->pitch + x * BPP;
+        Uint8 *target_pixel_b = (Uint8 *)surface->pixels + ((int)(cy - r + dy)) * surface->pitch + x * BPP;
+ 
+        for (; x <= cx + dx; x++)
+        {
+            *(Uint32 *)target_pixel_a = pixel;
+            *(Uint32 *)target_pixel_b = pixel;
+            target_pixel_a += BPP;
+            target_pixel_b += BPP;
+        }
+    }
 }

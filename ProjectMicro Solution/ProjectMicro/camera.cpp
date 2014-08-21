@@ -84,6 +84,7 @@ void Camera::updateZoom()
 	zoomScroll = lerp(zoom, zoomLerp, zoomToPoint);
 
 	zoom = zoomScroll;
+	//zoom = zoomToPoint;
 }
 
 

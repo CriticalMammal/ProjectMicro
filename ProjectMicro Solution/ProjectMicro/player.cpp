@@ -11,7 +11,6 @@
 
 extern bool keys[];
 extern double xOffset, yOffset, zoom;
-//extern SDL_Renderer* renderer;
 
 Player::Player()
 {
@@ -25,7 +24,7 @@ Player::~Player()
 
 void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, double newSpeed)
 {
-	int randomPowerState = randomNumber(0, 2);
+	int randomPowerState = randomNumber(1, 1);
 	if (randomPowerState == 0)
 	{
 		chipPowered = false;
@@ -69,7 +68,7 @@ void Player::initializeChip(double xIn, double yIn, double wIn, double hIn, doub
 	maxSpeed = speed*20;
 	oldMaxSpeed = maxSpeed;
 	
-	boardWidth = 20;
+	boardWidth = 40;
 	boardHeight = boardWidth;
 	boardX = x;
 	boardY = y;
@@ -244,7 +243,7 @@ void Player::draw(SDL_Renderer *renderer)
 
 	// Draw Motherboard
 	SDL_Rect screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-	if (width*zoom > 2)
+	if (width*zoom > 5)
 	{
 		motherBoard.drawTileMap(screenRect, renderer);
 	}
